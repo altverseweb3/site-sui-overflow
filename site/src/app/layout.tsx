@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${urbanist.variable} antialiased`}>
+    <html lang="en" className={`${urbanist.variable} antialiased)`}>
+      <body>
         <Toaster />
         <Analytics />
         <SpeedInsights />
