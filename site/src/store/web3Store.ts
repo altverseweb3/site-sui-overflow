@@ -25,8 +25,8 @@ const useWeb3Store = create<StoreState>()(
         // These fields will be persisted
         activeWalletAddress: state.activeWalletAddress,
       }),
-    }
-  )
+    },
+  ),
 );
 
 export default useWeb3Store;

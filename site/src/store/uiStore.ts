@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Tab } from "@/types/ui";
+import { Tab } from "@/types/tab";
 
 interface UIStoreState {
   // Tab state
@@ -21,8 +21,8 @@ const useUIStore = create<UIStoreState>()(
       name: "altverse-storage-ui", // name of the item in localStorage
       storage: createJSONStorage(() => localStorage), // use localStorage
       version: 1, // version number for migrations
-    }
-  )
+    },
+  ),
 );
 
 export default useUIStore;
