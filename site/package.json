@@ -11,7 +11,7 @@
     "postinstall": "chmod +x .husky/pre-push && chmod +x .husky/pre-commit"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.2",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "class-variance-authority": "^0.7.1",

@@ -25,15 +25,17 @@ Visit [http://localhost:3000](http://localhost:3000) to view the application.
 ├── app/
 │   ├── page.tsx
 │   ├── landing.tsx
-│   └── dashboard.tsx
+│   ├── dapp/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
 ├── components/
 │   ├── ui/
 │   │   ├── Button.tsx
 │   │   ├── Card.tsx
 │   │   └── Modal.tsx
 │   ├── layout/
-│   │   ├── Header.tsx
-│   │   └── Footer.tsx
+│   │   ├── MainNav.tsx
+│   │   └── SiteHeader.tsx
 │   └── modals/
 │       ├── Swap.tsx
 │       ├── Bridge.tsx
