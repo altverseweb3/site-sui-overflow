@@ -1,18 +1,8 @@
-import type { MetaMaskInpageProvider } from '@metamask/providers';
-
-// Union type for different provider types
-export type WalletProvider = 
-  | MetaMaskInpageProvider 
-  // Add other provider types as needed, e.g.:
-  // | WalletConnectProvider when we get there
-  ;
-
 export interface WalletInfo {
   type: WalletType; // Static Enum to type/identify the wallet
   name: string; // human-readable name of the wallet e.g. "MetaMask"
   icon?: string; // will be an svg imported from /public
   address: string; // users wallet address, can seamlessly change during the session
-  provider: WalletProvider; // web3 provider e.g. window.ethereum - leaving as `any` type for future proofing, may lock down later
   chainId: number; // the currently connected chain on the wallet
 }
 

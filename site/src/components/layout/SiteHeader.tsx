@@ -5,12 +5,45 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import useWeb3Store from "@/store/web3Store";
+import {
+  connectMetamask,
+  disconnectMetamask,
+  truncateAddress,
+} from "@/utils/walletMethods";
+import { toast } from "sonner";
 
 export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const activeWallet = useWeb3Store((state) => state.activeWallet);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleMetamaskButtonClick = async () => {
+    if (activeWallet) {
+      try {
+        await disconnectMetamask();
+      } catch (error) {
+        toast("Failed to disconnect wallet.");
+        console.error("Failed to disconnect wallet: ", error);
+      }
+    } else {
+      console.log("Starting wallet connection...");
+      try {
+        const walletInfo = await connectMetamask();
+        console.log("Wallet connection result:", walletInfo);
+
+        if (!walletInfo) {
+          toast("Failed to connect wallet.");
+          console.error("Failed to connect wallet");
+        }
+      } catch (error) {
+        toast("Failed to connect wallet.");
+        console.error("Failed to connect wallet:", error);
+      }
+    }
   };
 
   return (
@@ -77,8 +110,15 @@ export function SiteHeader() {
             </svg>
           </Button>
 
-          <Button variant="outline" size="sm" className="whitespace-nowrap">
-            Connect Wallet
+          <Button
+            variant="outline"
+            size="sm"
+            className="whitespace-nowrap"
+            onClick={handleMetamaskButtonClick}
+          >
+            {activeWallet
+              ? truncateAddress(activeWallet.address)
+              : "Connect Metamask"}
           </Button>
         </div>
       </div>

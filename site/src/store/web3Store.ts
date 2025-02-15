@@ -1,5 +1,3 @@
-// Stores web3 related context
-
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { WalletInfo, Web3StoreState, WalletType } from "@/types/wallet";
@@ -11,22 +9,30 @@ const useWeb3Store = create<Web3StoreState>()(
       activeWallet: null,
 
       addWallet: (wallet: WalletInfo) => {
+        // Create a new wallet object without the provider
+        const walletForStorage = {
+          type: wallet.type,
+          name: wallet.name,
+          address: wallet.address,
+          chainId: wallet.chainId,
+        };
+
         set((state) => {
           const existingWalletIndex = state.connectedWallets.findIndex(
-            (w) => w.type === wallet.type
+            (w) => w.type === wallet.type,
           );
-          let newWallets: WalletInfo[];
+          let newWallets: Omit<WalletInfo, "provider">[];
 
           if (existingWalletIndex >= 0) {
             newWallets = [...state.connectedWallets];
-            newWallets[existingWalletIndex] = wallet;
+            newWallets[existingWalletIndex] = walletForStorage;
           } else {
-            newWallets = [...state.connectedWallets, wallet];
+            newWallets = [...state.connectedWallets, walletForStorage];
           }
 
           return {
             connectedWallets: newWallets,
-            activeWallet: state.activeWallet || wallet,
+            activeWallet: state.activeWallet || walletForStorage,
           };
         });
       },
@@ -34,7 +40,7 @@ const useWeb3Store = create<Web3StoreState>()(
       removeWallet: (walletType: WalletType) => {
         set((state) => ({
           connectedWallets: state.connectedWallets.filter(
-            (w) => w.type !== walletType
+            (w) => w.type !== walletType,
           ),
           activeWallet:
             state.activeWallet?.type === walletType
@@ -55,7 +61,7 @@ const useWeb3Store = create<Web3StoreState>()(
       updateWalletAddress: (walletType: WalletType, address: string) => {
         set((state) => ({
           connectedWallets: state.connectedWallets.map((wallet) =>
-            wallet.type === walletType ? { ...wallet, address } : wallet
+            wallet.type === walletType ? { ...wallet, address } : wallet,
           ),
           activeWallet:
             state.activeWallet?.type === walletType
@@ -67,7 +73,7 @@ const useWeb3Store = create<Web3StoreState>()(
       updateWalletChainId: (walletType: WalletType, chainId: number) => {
         set((state) => ({
           connectedWallets: state.connectedWallets.map((wallet) =>
-            wallet.type === walletType ? { ...wallet, chainId } : wallet
+            wallet.type === walletType ? { ...wallet, chainId } : wallet,
           ),
           activeWallet:
             state.activeWallet?.type === walletType
@@ -88,14 +94,26 @@ const useWeb3Store = create<Web3StoreState>()(
       storage: createJSONStorage(() => localStorage),
       version: 1,
       partialize: (state) => ({
-        connectedWallets: state.connectedWallets,
-        activeWallet: state.activeWallet,
+        // Only persist these fields, and ensure we're not storing the provider
+        connectedWallets: state.connectedWallets.map((wallet) => ({
+          type: wallet.type,
+          name: wallet.name,
+          address: wallet.address,
+          chainId: wallet.chainId,
+        })),
+        activeWallet: state.activeWallet
+          ? {
+              type: state.activeWallet.type,
+              name: state.activeWallet.name,
+              address: state.activeWallet.address,
+              chainId: state.activeWallet.chainId,
+            }
+          : null,
       }),
-    }
-  )
+    },
+  ),
 );
 
-// Useful selector for getting the current chain ID
 export const useCurrentChainId = () => {
   return useWeb3Store((state) => state.activeWallet?.chainId ?? null);
 };

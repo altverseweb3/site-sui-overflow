@@ -1,6 +1,3 @@
-
 export default function BridgeModal() {
-    return (
-      <div>bridge</div>
-    )
-  }
+  return <div>bridge</div>;
+}
