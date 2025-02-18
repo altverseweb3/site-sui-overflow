@@ -8,12 +8,10 @@ import { Tab } from "@/types/tab";
 export function MainNav() {
   const router = useRouter();
   const pathname = usePathname();
-
-  // Get current tab from URL path
   const currentTab = pathname.split("/").pop() as Tab;
 
   return (
-    <nav className="flex items-center space-x-4">
+    <>
       {(Object.entries(TAB_CONFIG) as [Tab, (typeof TAB_CONFIG)[Tab]][]).map(
         ([value, config]) => (
           <Button
@@ -21,7 +19,7 @@ export function MainNav() {
             variant={currentTab === value ? "default" : "ghost"}
             disabled={config.disabled}
             title={config.disabledMessage}
-            className="text-sm font-medium transition-colors"
+            className="w-full md:w-auto text-sm font-medium transition-colors justify-start md:justify-center"
             onClick={() => {
               if (!config.disabled) {
                 router.push(`/dapp/${value}`);
@@ -32,6 +30,6 @@ export function MainNav() {
           </Button>
         ),
       )}
-    </nav>
+    </>
   );
 }

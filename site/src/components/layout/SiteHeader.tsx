@@ -12,14 +12,18 @@ import {
   truncateAddress,
 } from "@/utils/walletMethods";
 import { toast } from "sonner";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/Sheet";
+import { Menu } from "lucide-react";
 
 export function SiteHeader() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const activeWallet = useWeb3Store((state) => state.activeWallet);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
 
   const handleMetamaskButtonClick = async () => {
     if (activeWallet) {
@@ -60,9 +64,7 @@ export function SiteHeader() {
               className="h-8 w-8"
               priority
             />
-            <span className="text-xl font-semibold hidden sm:inline-block">
-              altverse
-            </span>
+            <span className="text-xl font-semibold">altverse</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -73,47 +75,56 @@ export function SiteHeader() {
 
         {/* Right Side Actions */}
         <div className="ml-auto flex items-center gap-4">
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            className="md:hidden"
-            size="sm"
-            onClick={toggleMobileMenu}
-            aria-expanded={isMobileMenuOpen}
-          >
-            <span className="sr-only">
-              {isMobileMenuOpen ? "Close menu" : "Open menu"}
-            </span>
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                // X icon when menu is open
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                // Hamburger icon when menu is closed
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </Button>
+          {/* Mobile Menu */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="sm">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[360px]">
+              <SheetHeader>
+                <SheetTitle>
+                  <Link
+                    href="/"
+                    className="flex items-center gap-3"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Image
+                      src="/tokens/ALT.svg"
+                      alt="Altverse Logo"
+                      width={24}
+                      height={24}
+                      className="h-6 w-6"
+                      priority
+                    />
+                    <span className="text-lg font-semibold">altverse</span>
+                  </Link>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-6 mt-6">
+                <nav className="flex flex-col gap-2">
+                  <MainNav />
+                </nav>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleMetamaskButtonClick}
+                >
+                  {activeWallet
+                    ? truncateAddress(activeWallet.address)
+                    : "Connect Metamask"}
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
 
+          {/* Desktop Wallet Button */}
           <Button
             variant="outline"
             size="sm"
-            className="whitespace-nowrap"
+            className="hidden md:inline-flex whitespace-nowrap"
             onClick={handleMetamaskButtonClick}
           >
             {activeWallet
@@ -122,17 +133,6 @@ export function SiteHeader() {
           </Button>
         </div>
       </div>
-
-      {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="border-t px-6 py-3">
-            <div className="flex flex-col space-y-2">
-              <MainNav />
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
