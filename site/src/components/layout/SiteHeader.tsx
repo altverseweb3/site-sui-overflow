@@ -3,7 +3,7 @@
 import { MainNav } from "@/components/layout/MainNav";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/Button";
 import { useState } from "react";
 import useWeb3Store from "@/store/web3Store";
 import {
