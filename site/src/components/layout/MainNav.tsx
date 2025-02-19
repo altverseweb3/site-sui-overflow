@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { TAB_CONFIG } from "@/config/tabs";
-import { Tab } from "@/types/tab";
+import { Tab } from "@/types/ui";
 
 interface MainNavProps {
   onNavigate: () => void;

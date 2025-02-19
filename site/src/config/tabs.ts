@@ -1,4 +1,4 @@
-import { Tab } from "@/types/tab";
+import { Tab } from "@/types/ui";
 
 interface TabConfig {
   label: string;

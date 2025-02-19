@@ -20,6 +20,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/Sheet";
 import { Menu } from "lucide-react";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -134,6 +135,7 @@ export function SiteHeader() {
               ? truncateAddress(activeWallet.address)
               : "Connect Metamask"}
           </Button>
+          <ThemeToggle />
         </div>
       </div>
     </header>
