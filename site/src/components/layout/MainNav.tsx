@@ -5,10 +5,21 @@ import { Button } from "@/components/ui/Button";
 import { TAB_CONFIG } from "@/config/tabs";
 import { Tab } from "@/types/tab";
 
-export function MainNav() {
+interface MainNavProps {
+  onNavigate: () => void;
+}
+
+export function MainNav({ onNavigate }: MainNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const currentTab = pathname.split("/").pop() as Tab;
+
+  const handleNavigation = (value: Tab, disabled?: boolean) => {
+    if (!disabled) {
+      router.push(`/dapp/${value}`);
+      onNavigate(); // Call the close function after navigation
+    }
+  };
 
   return (
     <>
@@ -20,11 +31,7 @@ export function MainNav() {
             disabled={config.disabled}
             title={config.disabledMessage}
             className="w-full md:w-auto text-sm font-medium transition-colors justify-start md:justify-center"
-            onClick={() => {
-              if (!config.disabled) {
-                router.push(`/dapp/${value}`);
-              }
-            }}
+            onClick={() => handleNavigation(value, config.disabled)}
           >
             {config.label}
           </Button>

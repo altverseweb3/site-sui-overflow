@@ -29,6 +29,7 @@ export function SiteHeader() {
     if (activeWallet) {
       try {
         await disconnectMetamask();
+        setIsOpen(false); // Close the sheet after disconnecting
       } catch (error) {
         toast("Failed to disconnect wallet.");
         console.error("Failed to disconnect wallet: ", error);
@@ -42,6 +43,8 @@ export function SiteHeader() {
         if (!walletInfo) {
           toast("Failed to connect wallet.");
           console.error("Failed to connect wallet");
+        } else {
+          setIsOpen(false); // Close the sheet after successful connection
         }
       } catch (error) {
         toast("Failed to connect wallet.");
@@ -52,7 +55,7 @@ export function SiteHeader() {
 
   return (
     <header className="bg-background sticky top-0 z-40 w-full border-b">
-      <div className="flex h-16 items-center px-6">
+      <div className="flex h-16 items-center px-4">
         {/* Logo and Nav Container */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-3">
@@ -69,7 +72,7 @@ export function SiteHeader() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <MainNav />
+            <MainNav onNavigate={() => void 0} />
           </div>
         </div>
 
@@ -78,12 +81,12 @@ export function SiteHeader() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="mr-0 px-2">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[360px]">
+            <SheetContent side="right" className="w-[300px] sm:w-[360px]">
               <SheetHeader>
                 <SheetTitle>
                   <Link
@@ -105,7 +108,7 @@ export function SiteHeader() {
               </SheetHeader>
               <div className="flex flex-col gap-6 mt-6">
                 <nav className="flex flex-col gap-2">
-                  <MainNav />
+                  <MainNav onNavigate={() => setIsOpen(false)} />
                 </nav>
                 <Button
                   variant="outline"
