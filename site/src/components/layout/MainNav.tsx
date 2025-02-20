@@ -16,7 +16,7 @@ export function MainNav({ onNavigate }: MainNavProps) {
 
   const handleNavigation = (value: Tab, disabled?: boolean) => {
     if (!disabled) {
-      router.push(`/dapp/${value}`);
+      router.push(`/${value}`);
       onNavigate(); // Call the close function after navigation
     }
   };

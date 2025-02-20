@@ -49,7 +49,7 @@ export default function Home() {
             <h1 className="text-4xl font-normal mb-4">
               Altverse: The Unified Crypto Interface
             </h1>
-            <Link href="/dapp">
+            <Link href="/swap">
               <Button variant="outline" size="lg">
                 Get Started
               </Button>
