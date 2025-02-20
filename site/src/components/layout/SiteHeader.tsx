@@ -68,7 +68,7 @@ export function SiteHeader() {
               className="h-8 w-8"
               priority
             />
-            <span className="text-xl font-semibold">altverse</span>
+            <span className="text-xl font-normal">altverse</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -103,7 +103,7 @@ export function SiteHeader() {
                       className="h-6 w-6"
                       priority
                     />
-                    <span className="text-lg font-semibold">altverse</span>
+                    <span className="text-lg font-normal">altverse</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>
