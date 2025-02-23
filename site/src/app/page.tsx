@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { BentoCard, BentoGrid } from "@/components/ui/BentoGrid";
+import { LandingBackground } from "@/components/ui/LandingBackground";
 
 const features = [
   {
@@ -40,6 +41,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex items-center">
       <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3">
+        <LandingBackground />
+
         <div className="flex flex-col items-center">
           <Button variant="outline" size="sm" className="mb-6 mt-4 md:mt-0">
             Learn More
