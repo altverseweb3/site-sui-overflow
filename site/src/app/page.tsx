@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { BentoCard, BentoGrid } from "@/components/ui/BentoGrid";
 import { LandingBackground } from "@/components/ui/LandingBackground";
+import ShimmerButton from "@/components/ui/ShimmerButton";
 
 const features = [
   {
@@ -53,9 +54,17 @@ export default function Home() {
               Altverse: The Unified Crypto Interface
             </h1>
             <Link href="/swap">
-              <Button variant="outline" size="lg">
-                Get Started
-              </Button>
+              <ShimmerButton
+                className="h-12 shadow-2xl"
+                shimmerColor="rgb(256 158 11)"
+                shimmerSize="0.12em"
+                shimmerDuration="2.5s"
+                background="black"
+              >
+                <span className="whitespace-pre-wrap px-8 text-center text-base font-semibold leading-none tracking-tight text-white">
+                  Get Started
+                </span>
+              </ShimmerButton>
             </Link>
           </div>
 
