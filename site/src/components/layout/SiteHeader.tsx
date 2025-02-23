@@ -60,7 +60,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/tokens/ALT.svg"
+              src="/tokens/branded/ALT.svg"
               alt="Altverse Logo"
               width={32}
               height={32}
@@ -95,7 +95,7 @@ export function SiteHeader() {
                     onClick={() => setIsOpen(false)}
                   >
                     <Image
-                      src="/tokens/ALT.svg"
+                      src="/tokens/branded/ALT.svg"
                       alt="Altverse Logo"
                       width={24}
                       height={24}

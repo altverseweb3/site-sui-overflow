@@ -17,7 +17,7 @@ const features: Feature[] = [
     name: "Swap & Bridge Across Chains",
     description:
       "Swap and bridge intra-chain and cross-chain at the best market rates. Instant and faster-than-finality operations powered by Wormhole.",
-    className: "col-span-1 md:col-span-3 md:row-span-1ggg",
+    className: "col-span-1 md:col-span-3 md:row-span-1",
     icon: "Zap",
   },
   {
@@ -56,14 +56,12 @@ const iconMap: IconMap = {
 export default function Home() {
   return (
     <div className="min-h-screen flex items-center">
-      <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3">
-        <LandingBackground />
-
+      <LandingBackground />
+      <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3 relative z-10">
         <div className="flex flex-col items-center">
-          <Button variant="outline" size="sm" className="mb-6 mt-4 md:mt-0">
+          <Button variant="secondary" size="sm" className="mb-6 mt-4 md:mt-0">
             Learn More
           </Button>
-
           <div className="text-center mb-6">
             <h1 className="text-4xl font-normal mb-4">
               Altverse: The Unified Crypto Interface
@@ -82,11 +80,9 @@ export default function Home() {
               </ShimmerButton>
             </Link>
           </div>
-
           <BentoGrid className="w-full grid-cols-1 md:grid-cols-5 gap-6 md:auto-rows-[min(340px,33vh)]">
             {features.map((feature) => {
               const IconComponent = iconMap[feature.icon];
-
               return (
                 <BentoCard
                   key={feature.name}
