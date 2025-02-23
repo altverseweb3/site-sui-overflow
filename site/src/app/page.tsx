@@ -3,40 +3,55 @@ import { Button } from "@/components/ui/Button";
 import { BentoCard, BentoGrid } from "@/components/ui/BentoGrid";
 import { LandingBackground } from "@/components/ui/LandingBackground";
 import ShimmerButton from "@/components/ui/ShimmerButton";
+import { Zap, Globe, HandCoins, Layers, LucideIcon } from "lucide-react";
 
-const features = [
+interface Feature {
+  name: string;
+  description: string;
+  className: string;
+  icon: "Zap" | "Globe" | "HandCoins" | "Layers";
+}
+
+const features: Feature[] = [
   {
     name: "Swap & Bridge Across Chains",
     description:
       "Swap and bridge intra-chain and cross-chain at the best market rates. Instant and faster-than-finality operations powered by Wormhole.",
-    href: "/",
-    cta: "Learn more",
-    className: "col-span-1 md:col-span-3 md:row-span-1",
+    className: "col-span-1 md:col-span-3 md:row-span-1ggg",
+    icon: "Zap",
   },
   {
     name: "Completely Decentralized",
     description: "No central entities. Fully smart-contract based.",
-    href: "/",
-    cta: "Learn more",
     className: "col-span-1 md:col-span-2 md:row-span-1",
+    icon: "Globe",
   },
   {
     name: "Earn",
     description:
       "Access top-yielding protocols for farming, lending, and borrowing locally and across chains.",
-    href: "/",
-    cta: "Learn more",
     className: "col-span-1 md:col-span-2 md:row-span-1",
+    icon: "HandCoins",
   },
   {
     name: "Cross-Chain & Cross-Environment",
     description:
       "Access Ethereum, Solana, Sui, and other popular L1s/L2s and associated protocols seamlessly.",
-    href: "/",
-    cta: "Learn more",
     className: "col-span-1 md:col-span-3 md:row-span-1",
+    icon: "Layers",
   },
 ];
+
+type IconMap = {
+  [key in Feature["icon"]]: LucideIcon;
+};
+
+const iconMap: IconMap = {
+  Zap: Zap,
+  Globe: Globe,
+  HandCoins: HandCoins,
+  Layers: Layers,
+};
 
 export default function Home() {
   return (
@@ -69,14 +84,18 @@ export default function Home() {
           </div>
 
           <BentoGrid className="w-full grid-cols-1 md:grid-cols-5 gap-6 md:auto-rows-[min(340px,33vh)]">
-            {features.map((feature) => (
-              <BentoCard
-                key={feature.name}
-                {...feature}
-                Icon={() => null}
-                background={null}
-              />
-            ))}
+            {features.map((feature) => {
+              const IconComponent = iconMap[feature.icon];
+
+              return (
+                <BentoCard
+                  key={feature.name}
+                  {...feature}
+                  Icon={IconComponent}
+                  background={null}
+                />
+              );
+            })}
           </BentoGrid>
         </div>
       </div>
