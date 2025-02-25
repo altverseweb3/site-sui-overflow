@@ -55,7 +55,7 @@ export function SiteHeader() {
 
   return (
     <header className="bg-background sticky top-0 z-40 w-full border-b">
-      <div className="flex h-16 items-center px-4">
+      <div className="flex h-14 items-center px-4">
         {/* Logo and Nav Container */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-3">

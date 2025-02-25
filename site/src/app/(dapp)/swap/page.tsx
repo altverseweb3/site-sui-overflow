@@ -25,7 +25,7 @@ const SwapComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex items-start justify-center min-h-screen bg-background p-4 pt-[10vh]">
+    <div className="flex items-start justify-center bg-background p-4 pt-6">
       <Card className="w-full max-w-[520px] sm:max-w-md bg-zinc-900/50 border-zinc-800">
         <CardContent className="space-y-4 p-6">
           {/* Send Box */}
