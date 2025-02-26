@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
-interface TokenButtonProps {
+export interface TokenButtonProps {
   variant: "amber" | "sky";
 }
 
