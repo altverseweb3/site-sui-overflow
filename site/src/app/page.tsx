@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import { BentoCard, BentoGrid } from "@/components/ui/BentoGrid";
 import { LandingBackground } from "@/components/ui/LandingBackground";
 import ShimmerButton from "@/components/ui/ShimmerButton";
@@ -65,9 +64,12 @@ export default function Home() {
       <LandingBackground />
       <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3 relative z-10">
         <div className="flex flex-col items-center">
-          <Button variant="secondary" size="sm" className="mb-6 mt-4 md:mt-0">
-            Learn More
-          </Button>
+          <Link href="/about" target="_blank" rel="noopener noreferrer">
+            <button className="flex items-center gap-1 px-3 py-1 mb-6 mt-4 md:mt-0 rounded-full bg-gray-500/10 text-gray-400/80 hover:bg-amber-500/30 hover:text-white/90 duration-300 text-xs font-semibold border border-gray-500/20 hover:border-amber-500/20">
+              <span className="opacity-70">✨</span>
+              <span>Learn More →</span>
+            </button>
+          </Link>
           <div className="text-center mb-6">
             <h1 className="text-4xl font-normal mb-4">
               Altverse: The Unified Crypto Interface
