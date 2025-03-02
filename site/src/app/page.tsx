@@ -61,7 +61,7 @@ const iconMap: IconMap = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center">
+    <div className="min-h-screen flex items-center relative overflow-hidden">
       <LandingBackground />
       <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3 relative z-10">
         <div className="flex flex-col items-center">
@@ -86,7 +86,7 @@ export default function Home() {
               </ShimmerButton>
             </Link>
           </div>
-          <BentoGrid className="w-full grid-cols-1 md:grid-cols-5 gap-6 md:auto-rows-[min(340px,33vh)]">
+          <BentoGrid className="w-full grid-cols-1 md:grid-cols-5 gap-6 md:auto-rows-[min(340px,33vh)] sm:mb-0 mb-4">
             {features.map((feature) => {
               const IconComponent = iconMap[feature.icon];
               return (

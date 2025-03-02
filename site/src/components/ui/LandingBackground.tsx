@@ -42,7 +42,7 @@ const LandingBackground = () => {
   return (
     <div>
       <div
-        className="bg-black pointer-events-none absolute inset-0 transition-opacity duration-1000 ease-out"
+        className="pointer-events-none absolute fixed inset-0 transition-opacity duration-1000 ease-out"
         style={{ opacity: opacity / 100 }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-amber-500/20 to-amber-500/10" />
