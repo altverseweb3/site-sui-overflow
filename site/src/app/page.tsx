@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { BentoCard, BentoGrid } from "@/components/ui/BentoGrid";
 import { LandingBackground } from "@/components/ui/LandingBackground";
 import ShimmerButton from "@/components/ui/ShimmerButton";
 import { Zap, Globe, HandCoins, Layers, LucideIcon } from "lucide-react";
+import { GlobeCard } from "@/components/ui/GlobeCard";
+import { ReactNode } from "react";
 
 interface Feature {
   name: string;
   description: string;
   className: string;
   icon: "Zap" | "Globe" | "HandCoins" | "Layers";
+  background?: ReactNode;
 }
 
 const features: Feature[] = [
@@ -25,6 +30,7 @@ const features: Feature[] = [
     description: "No central entities. Fully smart-contract based.",
     className: "col-span-1 md:col-span-2 md:row-span-1",
     icon: "Globe",
+    background: <GlobeCard />,
   },
   {
     name: "Earn",
@@ -88,7 +94,7 @@ export default function Home() {
                   key={feature.name}
                   {...feature}
                   Icon={IconComponent}
-                  background={null}
+                  background={feature.background}
                 />
               );
             })}
