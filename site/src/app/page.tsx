@@ -7,6 +7,7 @@ import ShimmerButton from "@/components/ui/ShimmerButton";
 import { Zap, Globe, HandCoins, Layers, LucideIcon } from "lucide-react";
 import { GlobeCard } from "@/components/ui/GlobeCard";
 import { ReactNode } from "react";
+import Tiles from "@/components/ui/Tiles";
 
 interface Feature {
   name: string;
@@ -44,6 +45,7 @@ const features: Feature[] = [
       "Access Ethereum, Solana, Sui, and other popular L1s/L2s and associated protocols seamlessly.",
     className: "col-span-1 md:col-span-3 md:row-span-1",
     icon: "Layers",
+    background: <Tiles />,
   },
 ];
 
