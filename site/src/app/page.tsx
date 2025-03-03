@@ -8,6 +8,7 @@ import { Zap, Globe, HandCoins, Layers, LucideIcon } from "lucide-react";
 import { GlobeCard } from "@/components/ui/GlobeCard";
 import { ReactNode } from "react";
 import Tiles from "@/components/ui/Tiles";
+import Spider from "@/components/ui/Spider";
 
 interface Feature {
   name: string;
@@ -21,9 +22,10 @@ const features: Feature[] = [
   {
     name: "Swap & Bridge Across Chains",
     description:
-      "Swap and bridge intra-chain and cross-chain at the best market rates. Instant and faster-than-finality operations powered by Wormhole.",
+      "Swap and bridge intra-chain/cross-chain at optimal rates. Near-Instant operations powered by Wormhole.",
     className: "col-span-1 md:col-span-3 md:row-span-1",
     icon: "Zap",
+    background: <Spider />,
   },
   {
     name: "Completely Decentralized",
