@@ -8,23 +8,23 @@ interface TabConfig {
 
 export const TAB_CONFIG: Record<Tab, TabConfig> = {
   swap: {
-    label: "Swap",
+    label: "swap",
   },
   bridge: {
-    label: "Bridge",
+    label: "bridge",
   },
   stake: {
-    label: "Stake",
+    label: "stake",
     disabled: true,
     disabledMessage: "Coming soon",
   },
   borrow: {
-    label: "Borrow",
+    label: "borrow",
     disabled: true,
     disabledMessage: "Coming soon",
   },
   dashboard: {
-    label: "Dashboard",
+    label: "dashboard",
     disabled: true,
     disabledMessage: "Coming soon",
   },

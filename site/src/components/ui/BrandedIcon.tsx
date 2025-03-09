@@ -1,46 +1,26 @@
 import React, { ButtonHTMLAttributes } from "react";
 import { Button } from "@/components/ui/Button";
-import {
-  Coins,
-  Link,
-  Wallet,
-  ArrowRightLeft,
-  Repeat,
-  Network,
-} from "lucide-react";
+import { X } from "lucide-react";
 
 // Use a string literal type for the icon names
-type AvailableIconName =
-  | "Coins"
-  | "Link"
-  | "Wallet"
-  | "ArrowRightLeft"
-  | "Repeat"
-  | "Network";
+type AvailableIconName = "X";
 
 // Props interface extending HTML button attributes
-interface BrandedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface BrandedIconProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconName: AvailableIconName;
-  buttonText: string;
   className?: string;
   iconClassName?: string;
 }
 
-export function BrandedButton({
+export function BrandedIcon({
   iconName,
-  buttonText,
   className = "",
-  iconClassName = "h-6 w-6",
+  iconClassName = "",
   ...props
-}: BrandedButtonProps) {
+}: BrandedIconProps) {
   // Get the correct icon component directly in the component
   const IconComponent = {
-    Coins,
-    Link,
-    Wallet,
-    ArrowRightLeft,
-    Repeat,
-    Network,
+    X,
   }[iconName];
 
   return (
@@ -48,10 +28,9 @@ export function BrandedButton({
       className={`w-full bg-amber-500/25 hover:bg-amber-500/50 hover:text-amber-400 text-amber-500 border-[#61410B] border-[1px] rounded-lg leading-zero text-lg ${className}`}
       {...props}
     >
-      <IconComponent className={`mr-2 ${iconClassName}`} />
-      {buttonText}
+      <IconComponent className={iconClassName} />
     </Button>
   );
 }
 
-export default BrandedButton;
+export default BrandedIcon;

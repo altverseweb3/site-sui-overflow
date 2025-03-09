@@ -1,7 +1,6 @@
 "use client";
 
 import { MainNav } from "@/components/layout/MainNav";
-import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
@@ -20,6 +19,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/Sheet";
 import { Menu } from "lucide-react";
+import BrandedButton from "@/components/ui/BrandedButton";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +58,7 @@ export function SiteHeader() {
       <div className="flex h-14 items-center px-4">
         {/* Logo and Nav Container */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <Image
               src="/tokens/branded/ALT.svg"
               alt="Altverse Logo"
@@ -68,7 +68,7 @@ export function SiteHeader() {
               priority
             />
             <span className="text-xl font-normal">altverse</span>
-          </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
@@ -86,11 +86,13 @@ export function SiteHeader() {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[360px]">
+            <SheetContent
+              side="right"
+              className="w-[300px] sm:w-[360px] [&_svg.lucide-x]:text-amber-500 [&_svg.lucide-x]:bg-[#442E0B] [&_svg.lucide-x]:rounded-[3px] [&_svg.lucide-x]:border-[#61410B] [&_svg.lucide-x]:border-[0.5px] [&_button]:focus:ring-0 [&_button]:focus:ring-offset-0 [&_button]:focus:outline-none"
+            >
               <SheetHeader>
                 <SheetTitle>
-                  <Link
-                    href="/"
+                  <div
                     className="flex items-center gap-3"
                     onClick={() => setIsOpen(false)}
                   >
@@ -103,37 +105,40 @@ export function SiteHeader() {
                       priority
                     />
                     <span className="text-lg font-normal">altverse</span>
-                  </Link>
+                  </div>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 mt-6">
                 <nav className="flex flex-col gap-2">
                   <MainNav onNavigate={() => setIsOpen(false)} />
                 </nav>
-                <Button
-                  variant="outline"
-                  className="w-full"
+                <BrandedButton
+                  className="md:inline-flex whitespace-nowrap text-sm h-[30px]"
+                  iconClassName="h-4 w-4"
                   onClick={handleMetamaskButtonClick}
-                >
-                  {activeWallet
-                    ? truncateAddress(activeWallet.address)
-                    : "Connect Metamask"}
-                </Button>
+                  iconName="Wallet"
+                  buttonText={
+                    activeWallet
+                      ? truncateAddress(activeWallet.address)
+                      : "connect wallet"
+                  }
+                ></BrandedButton>
               </div>
             </SheetContent>
           </Sheet>
 
           {/* Desktop Wallet Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden md:inline-flex whitespace-nowrap"
+          <BrandedButton
+            className="hidden md:inline-flex whitespace-nowrap text-sm h-[30px]"
+            iconClassName="h-4 w-4"
             onClick={handleMetamaskButtonClick}
-          >
-            {activeWallet
-              ? truncateAddress(activeWallet.address)
-              : "Connect Metamask"}
-          </Button>
+            iconName="Wallet"
+            buttonText={
+              activeWallet
+                ? truncateAddress(activeWallet.address)
+                : "connect wallet"
+            }
+          ></BrandedButton>
         </div>
       </div>
     </header>
