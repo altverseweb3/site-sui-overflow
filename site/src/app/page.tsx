@@ -9,6 +9,7 @@ import { GlobeCard } from "@/components/ui/GlobeCard";
 import { ReactNode } from "react";
 import Tiles from "@/components/ui/Tiles";
 import Spider from "@/components/ui/Spider";
+import BlurIn from "@/components/ui/BlurIn";
 
 interface Feature {
   name: string;
@@ -69,15 +70,22 @@ export default function Home() {
       <div className="w-full max-w-5xl mx-auto px-4 md:px-4 py-3 relative z-10">
         <div className="flex flex-col items-center">
           <Link href="/about" target="_blank" rel="noopener noreferrer">
-            <button className="flex items-center gap-1 px-3 py-1 mb-6 mt-4 md:mt-0 rounded-full bg-gray-500/10 text-gray-400/80 hover:bg-amber-500/30 hover:text-white/90 duration-300 text-xs font-semibold border border-gray-500/20 hover:border-amber-500/20">
+            <button className="flex items-center gap-1 px-3 py-1 mb-4 mt-4 rounded-full bg-gray-500/10 text-gray-400/80 hover:bg-amber-500/30 hover:text-white/90 duration-300 text-xs font-semibold border border-gray-500/20 hover:border-amber-500/20">
               <span className="opacity-70">✨</span>
               <span>Learn More →</span>
             </button>
           </Link>
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-normal mb-4">
-              Altverse: The Unified Crypto Interface
-            </h1>
+            <BlurIn
+              word="Altverse: The Unified Crypto Interface"
+              className="bg-gradient-to-br from-white from-80% to-white/1 bg-clip-text 
+                        my-4
+                        text-4xl lg:text-[42px]
+                        font-light
+                        leading-none tracking-tighter 
+                        text-transparent text-balance translate-y-[-0.6rem] pointer-events-none"
+              duration={2}
+            />
             <Link href="/swap">
               <ShimmerButton
                 className="h-12 shadow-2xl"
