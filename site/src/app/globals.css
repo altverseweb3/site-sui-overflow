@@ -31,7 +31,7 @@
     --radius: 0.3rem;
   }
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -78,5 +78,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .numeric-input {
+    @apply font-mono text-right tabular-nums;
   }
 }

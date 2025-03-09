@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Urbanist } from "next/font/google";
+import { Urbanist, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "sonner";
@@ -9,6 +9,12 @@ import "./globals.css";
 const urbanist = Urbanist({
   subsets: ["latin"],
   variable: "--font-urbanist",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-mono",
 });
 
 export const metadata: Metadata = {
@@ -22,9 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${urbanist.variable} antialiased`}>
+    <html
+      lang="en"
+      className={`${urbanist.variable} ${ibmPlexMono.variable} antialiased`}
+    >
       <head />
-      <body className="min-h-screen bg-background">
+      <body className="bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

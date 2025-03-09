@@ -7,9 +7,11 @@ export default function DAppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex flex-col h-dvh">
       <SiteHeader />
-      <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+      <main className="container mx-auto flex-1 md:h-screen pt-6 px-2 sm:px-4">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );

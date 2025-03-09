@@ -12,6 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["var(--font-urbanist)", ...fontFamily.sans],
+        mono: ["var(--font-ibm-plex-mono)", ...fontFamily.mono],
       },
       colors: {
         background: "hsl(var(--background))",

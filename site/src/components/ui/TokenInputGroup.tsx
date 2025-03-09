@@ -18,7 +18,7 @@ export function TokenInputGroup({
   readOnly = false,
 }: TokenInputGroupProps) {
   return (
-    <div className="flex justify-between items-start gap-4 w-full">
+    <div className="flex justify-between items-start gap-2 sm:gap-4 w-full">
       <SelectTokenButton variant={variant} />
       <TokenAmountInput
         amount={amount}
