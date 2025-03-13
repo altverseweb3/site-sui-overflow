@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { TAB_CONFIG } from "@/config/tabs";
@@ -8,23 +9,26 @@ import { cn } from "@/lib/utils";
 interface MainNavProps {
   onNavigate: () => void;
 }
+
 export function MainNav({ onNavigate }: MainNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const currentTab = pathname.split("/").pop() as Tab;
+
   const handleNavigation = (value: Tab, disabled?: boolean) => {
     if (!disabled) {
       router.push(`/${value}`);
       onNavigate(); // Call the close function after navigation
     }
   };
+
   return (
     <>
       {(Object.entries(TAB_CONFIG) as [Tab, (typeof TAB_CONFIG)[Tab]][]).map(
         ([value, config]) => (
           <Button
             key={value}
-            variant={currentTab === value ? "default" : "ghost"}
+            variant="ghost"
             disabled={config.disabled}
             title={config.disabledMessage}
             className={cn(
