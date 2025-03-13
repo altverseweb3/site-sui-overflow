@@ -40,12 +40,18 @@ const SwapComponent = () => {
               variant="amber"
               amount={amount}
               onChange={handleAmountChange}
+              showSelectToken={true}
             />
           </AssetBox>
 
           {/* Receive Box */}
           <AssetBox title="receive" showSettings={false}>
-            <TokenInputGroup variant="sky" amount="" readOnly={true} />
+            <TokenInputGroup
+              variant="sky"
+              amount=""
+              readOnly={true}
+              showSelectToken={true}
+            />
           </AssetBox>
         </SwapInterface>
       </div>

@@ -3,12 +3,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { BrandedButton } from "@/components/ui/BrandedButton";
 
 // Use a string literal type for the icon names
-type AvailableIconName =
-  | "Coins"
-  | "Link"
-  | "ArrowRightLeft"
-  | "Repeat"
-  | "Network";
+type AvailableIconName = "Coins" | "Cable";
 
 interface SwapInterfaceProps {
   children: ReactNode;

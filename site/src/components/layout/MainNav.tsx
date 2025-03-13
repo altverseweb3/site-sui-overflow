@@ -24,11 +24,11 @@ export function MainNav({ onNavigate }: MainNavProps) {
         ([value, config]) => (
           <Button
             key={value}
-            variant="ghost"
+            variant={currentTab === value ? "default" : "ghost"}
             disabled={config.disabled}
             title={config.disabledMessage}
             className={cn(
-              "w-full md:w-auto text-sm font-medium transition-colors justify-start md:justify-center",
+              "w-full md:w-auto text-sm font-medium transition-colors bg-transparent justify-start md:justify-center",
               currentTab === value
                 ? "text-amber-500 hover:text-amber-400 hover:bg-transparent"
                 : config.disabled
