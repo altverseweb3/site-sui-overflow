@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="fixed bottom-0 left-0 right-0 border-t bg-background z-50">
       <div className="mx-auto flex h-10 items-center px-2 sm:px-4">
         <p className="text-xs text-muted-foreground truncate">
-          © {new Date().getFullYear()} Altverse
+          © {new Date().getFullYear()} altverse
         </p>
 
         <div className="ml-auto flex items-center gap-1">
