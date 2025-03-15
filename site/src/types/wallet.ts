@@ -8,8 +8,8 @@ export interface WalletInfo {
 
 export enum WalletType {
   METAMASK = "METAMASK",
-  WALLET_CONNECT = "WALLET_CONNECT", // just an example
-  // Add more wallet types as needed
+  COINBASE = "COINBASE",
+  WALLET_CONNECT = "WALLET_CONNECT",
 }
 
 export interface Web3StoreState {
