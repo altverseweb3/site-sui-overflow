@@ -12,7 +12,7 @@ export function SiteFooter() {
 
         <div className="ml-auto flex items-center gap-1">
           <SocialIcon
-            url="https://discord.gg/xDMCtNJCEv"
+            url="https://discord.gg/"
             bgColor="#0A0A0B"
             fgColor="#A6A6A9"
             style={{ height: 24, width: 24 }}

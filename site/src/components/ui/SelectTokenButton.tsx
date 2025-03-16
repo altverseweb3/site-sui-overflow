@@ -6,8 +6,10 @@ export interface TokenButtonProps {
 }
 
 export const SelectTokenButton: React.FC<TokenButtonProps> = ({ variant }) => {
+  // More consistent base classes with better mobile sizing
   const baseClasses =
-    "min-w-[90px] sm:min-w-[110px] md:min-w-[120px] flex items-center gap-1 px-1 sm:px-[6px] py-0.5 sm:py-[3px] rounded-[6px] text-xs sm:text-sm font-medium whitespace-nowrap";
+    "min-w-[100px] sm:min-w-[110px] md:min-w-[120px] flex items-center justify-between gap-2 px-2 py-2 sm:py-2 rounded-[6px] text-[1rem] font-medium whitespace-nowrap";
+
   const variantClasses: Record<TokenButtonProps["variant"], string> = {
     amber:
       "bg-amber-500/25 text-amber-500 hover:bg-amber-500/40 hover:text-amber-400 border-amber-500/15 border-[1px]",
@@ -17,10 +19,10 @@ export const SelectTokenButton: React.FC<TokenButtonProps> = ({ variant }) => {
   return (
     <Button
       type="button"
-      className={`${baseClasses} ${variantClasses[variant]} max-h-7 sm:max-h-none`}
+      className={`${baseClasses} ${variantClasses[variant]} h-9 sm:h-10`}
     >
       <span className="truncate">select token</span>
-      <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+      <ChevronDown className="h-4 w-4 flex-shrink-0" />
     </Button>
   );
 };

@@ -44,14 +44,14 @@ export function SwapInterface({
       className={`w-full bg-zinc-950 border-none rounded-[6px] ${className}`}
     >
       <CardContent className="p-2">
-        <div className="space-y-[1px]">{children}</div>
+        <div className="space-y-[3px]">{children}</div>
         <div className="mt-[10px]">
           <BrandedButton
             buttonText={actionButton.text}
             iconName={actionButton.iconName}
             onClick={actionButton.onClick}
             disabled={actionButton.disabled}
-            className="h-[36px] sm:h-auto w-full"
+            className="h-[40px] w-full"
           />
         </div>
 

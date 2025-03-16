@@ -20,7 +20,7 @@ const SwapComponent = () => {
   );
 
   return (
-    <div className="flex h-full w-full items-start justify-center pt-[8vh] min-h-[500px]">
+    <div className="flex h-full w-full items-start justify-center sm:pt-[6vh] pt-[2vh] min-h-[500px]">
       <div className="w-full max-w-md">
         <SwapInterface
           actionButton={{
