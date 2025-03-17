@@ -357,27 +357,27 @@ export default function Tiles(): JSX.Element {
   }, []);
   return (
     <div className="absolute inset-0 mt-1.5 overflow-hidden transition-all duration-200 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]">
-      <Marquee direction="right" speed={20} gradient={false} className="p-1">
+      <Marquee direction="right" speed={18} gradient={false} className="p-1">
         {tiles1.map((tile, idx) => (
           <Card key={idx} {...tile} />
         ))}
       </Marquee>
-      <Marquee speed={10} gradient={false} className="p-1">
+      <Marquee speed={18} gradient={false} className="p-1">
         {tiles2.map((tile, idx) => (
           <Card key={idx} {...tile} />
         ))}
       </Marquee>
-      <Marquee direction="right" speed={20} gradient={false} className="p-1">
+      <Marquee direction="right" speed={24} gradient={false} className="p-1">
         {tiles3.map((tile, idx) => (
           <Card key={idx} {...tile} />
         ))}
       </Marquee>
-      <Marquee speed={12} gradient={false} className="p-1">
+      <Marquee speed={16} gradient={false} className="p-1">
         {tiles4.map((tile, idx) => (
           <Card key={idx} {...tile} />
         ))}
       </Marquee>
-      <Marquee direction="right" speed={15} gradient={false} className="p-1">
+      <Marquee direction="right" speed={20} gradient={false} className="p-1">
         {tiles5.map((tile, idx) => (
           <Card key={idx} {...tile} />
         ))}

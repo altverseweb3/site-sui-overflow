@@ -10,6 +10,7 @@ import { ReactNode } from "react";
 import Tiles from "@/components/ui/Tiles";
 import Spider from "@/components/ui/Spider";
 import BlurIn from "@/components/ui/BlurIn";
+import EarnCard from "@/components/ui/EarnCard";
 
 interface Feature {
   name: string;
@@ -41,6 +42,7 @@ const features: Feature[] = [
       "Access top-yielding protocols for farming, lending, and borrowing locally and across chains.",
     className: "col-span-1 md:col-span-2 md:row-span-1",
     icon: "HandCoins",
+    background: <EarnCard />,
   },
   {
     name: "Cross-Chain & Cross-Environment",
