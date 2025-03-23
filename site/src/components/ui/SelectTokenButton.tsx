@@ -12,14 +12,14 @@ export const SelectTokenButton: React.FC<TokenButtonProps> = ({ variant }) => {
 
   const variantClasses: Record<TokenButtonProps["variant"], string> = {
     amber:
-      "bg-amber-500/25 text-amber-500 hover:bg-amber-500/40 hover:text-amber-400 border-amber-500/15 border-[1px]",
-    sky: "bg-[#0EA5E9]/10 text-sky-500 hover:bg-[#0b466b] hover:text-sky-400 border-[#0EA5E9]/25 border-[1px]",
+      "bg-amber-500/25 text-amber-500 hover:bg-amber-500/40 hover:text-amber-400 border-amber-500/15 border-[1px] text-sm sm:text-base",
+    sky: "bg-[#0EA5E9]/10 text-sky-500 hover:bg-[#0b466b] hover:text-sky-400 border-[#0EA5E9]/25 border-[1px] text-sm sm:text-base",
   };
 
   return (
     <Button
       type="button"
-      className={`${baseClasses} ${variantClasses[variant]} h-9 sm:h-10`}
+      className={`${baseClasses} ${variantClasses[variant]} h-[2rem] sm:h-[2.25rem]`}
     >
       <span className="truncate">select token</span>
       <ChevronDown className="h-4 w-4 flex-shrink-0" />

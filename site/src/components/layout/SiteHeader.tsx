@@ -3,7 +3,7 @@
 import { MainNav } from "@/components/layout/MainNav";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useWeb3Store from "@/store/web3Store";
 import { disconnectMetamask, truncateAddress } from "@/utils/walletMethods";
 import { toast } from "sonner";
@@ -17,10 +17,28 @@ import {
 import { Menu } from "lucide-react";
 import BrandedButton from "@/components/ui/BrandedButton";
 import { ConnectWalletModal } from "@/components/ui/ConnectWalletModal";
+import Link from "next/link";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const activeWallet = useWeb3Store((state) => state.activeWallet);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if window width is at or above the md breakpoint
+      if (window.innerWidth >= 768 && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isOpen]); // Only re-run if isOpen changes
 
   const handleDisconnect = async () => {
     if (activeWallet) {
@@ -43,7 +61,7 @@ export function SiteHeader() {
       <div className="flex h-14 items-center px-4">
         {/* Logo and Nav Container */}
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3">
+          <Link className="flex items-center gap-3" href="/">
             <Image
               src="/tokens/branded/ALT.svg"
               alt="Altverse Logo"
@@ -53,7 +71,7 @@ export function SiteHeader() {
               priority
             />
             <span className="text-xl font-normal">altverse</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
@@ -73,7 +91,7 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[300px] sm:w-[360px] [&_svg.lucide-x]:text-amber-500 [&_svg.lucide-x]:bg-[#442E0B] [&_svg.lucide-x]:rounded-[3px] [&_svg.lucide-x]:border-[#61410B] [&_svg.lucide-x]:border-[0.5px] [&_button]:focus:ring-0 [&_button]:focus:ring-offset-0 [&_button]:focus:outline-none"
+              className="w-[300px] sm:w-[360px] [&_svg.lucide-x]:text-amber-500 [&_svg.lucide-x]:w-[1.5rem] [&_svg.lucide-x]:h-[1.5rem] [&_svg.lucide-x]:bg-[#442E0B] [&_svg.lucide-x]:rounded-[3px] [&_svg.lucide-x]:border-[#61410B] [&_svg.lucide-x]:border-[0.5px] [&_button]:focus:ring-0 [&_button]:focus:ring-offset-0 [&_button]:focus:outline-none"
             >
               <SheetHeader>
                 <SheetTitle>

@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/Dialog";
+} from "@/components/ui/StyledDialog";
 import { Button } from "@/components/ui/Button";
 import { connectMetamask } from "@/utils/walletMethods";
 import { toast } from "sonner";
@@ -98,7 +98,14 @@ export const ConnectWalletModal = ({
           <span>Connect Wallet</span>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:w-1/2 w-2/3 rounded-lg bg-[#18181B] border-[#27272A] border [&_svg.lucide-x]:text-amber-500 [&_svg.lucide-x]:bg-[#442E0B] [&_svg.lucide-x]:rounded-[3px] [&_svg.lucide-x]:border-[#61410B] [&_svg.lucide-x]:border-[0.5px] [&_button]:focus:ring-0 [&_button]:focus:ring-offset-0 [&_button]:focus:outline-none">
+      <DialogContent
+        className="sm:w-1/2 w-2/3 rounded-lg bg-[#18181B] border-[#27272A] border 
+  [&>button]:!focus:ring-0 [&>button]:!focus:ring-offset-0 [&>button]:!focus:outline-none
+  [&_svg.lucide-x]:text-amber-500 [&_svg.lucide-x]:w-[1.5rem] [&_svg.lucide-x]:h-[1.5rem] 
+  [&_svg.lucide-x]:bg-[#442E0B] [&_svg.lucide-x]:rounded-[3px] 
+  [&_svg.lucide-x]:border-[#61410B] [&_svg.lucide-x]:border-[0.5px]"
+      >
+        {" "}
         <DialogHeader>
           <DialogTitle className="text-[#FAFAFA]">select wallet</DialogTitle>
         </DialogHeader>
