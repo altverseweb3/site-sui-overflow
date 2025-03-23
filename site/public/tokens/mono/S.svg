@@ -1,12 +1,6 @@
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Define the gradient -->
   <defs>
-    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#163448" />
-      <stop offset="33.33%" stop-color="#4D6079" />
-      <stop offset="66.66%" stop-color="#E05519" />
-      <stop offset="100%" stop-color="#FEC764" />
-    </linearGradient>
     
     <!-- Define a mask where white parts are visible and black parts are invisible -->
     <mask id="cutoutMask">
@@ -24,5 +18,5 @@
   </defs>
   
   <!-- Apply the gradient to the circle and apply the mask -->
-  <rect width="200.002" height="200" rx="100" fill="url(#backgroundGradient)" mask="url(#cutoutMask)"/>
+  <rect width="200.002" height="200" rx="100" fill="#FFFFFF" mask="url(#cutoutMask)"/>
 </svg>
