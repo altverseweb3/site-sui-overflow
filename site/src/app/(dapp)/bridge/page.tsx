@@ -5,6 +5,7 @@ import { Settings } from "lucide-react";
 import { AssetBox } from "@/components/ui/AssetBox";
 import { TokenInputGroup } from "@/components/ui/TokenInputGroup";
 import { SwapInterface } from "@/components/ui/SwapInterface";
+import { TokenSwitch } from "@/components/ui/TokenSwitch";
 
 const BridgeComponent = () => {
   const [amount, setAmount] = useState<string>("");
@@ -43,6 +44,8 @@ const BridgeComponent = () => {
               showSelectToken={true}
             />
           </AssetBox>
+
+          <TokenSwitch />
 
           {/* Receive Box */}
           <AssetBox title="receive" showSettings={false}>

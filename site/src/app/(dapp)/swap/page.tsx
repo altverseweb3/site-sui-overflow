@@ -6,6 +6,7 @@ import { AssetBox } from "@/components/ui/AssetBox";
 import { TokenInputGroup } from "@/components/ui/TokenInputGroup";
 import { SwapInterface } from "@/components/ui/SwapInterface";
 import { Chain, chains, defaultChain } from "@/config/chains";
+import { TokenSwitch } from "@/components/ui/TokenSwitch";
 
 const SwapComponent = () => {
   const [amount, setAmount] = useState<string>("");
@@ -80,6 +81,8 @@ const SwapComponent = () => {
               showSelectToken={true}
             />
           </AssetBox>
+
+          <TokenSwitch />
 
           {/* Receive Box */}
           <AssetBox
