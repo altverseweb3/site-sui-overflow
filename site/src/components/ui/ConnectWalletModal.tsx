@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { connectMetamask } from "@/utils/walletMethods";
 import { toast } from "sonner";
-import { WalletInfo, WalletType } from "@/types/wallet";
+import { WalletInfo, WalletType } from "@/types/web3";
 import { cn } from "@/lib/utils";
 
 type WalletOption = {

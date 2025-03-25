@@ -7,24 +7,42 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import { Chain, chainList, defaultChain } from "@/config/chains";
+import { Chain, chainList, defaultSourceChain } from "@/config/chains";
+import useWeb3Store from "@/store/web3Store";
 
 interface SelectChainButtonProps {
   selectedChain?: Chain;
   onChainSelect?: (chain: Chain) => void;
   displayName?: boolean;
   chainsToShow?: Chain[];
+  storeType?: "source" | "destination"; // Optional prop for Zustand store integration
 }
 
 export const SelectChainButton: React.FC<SelectChainButtonProps> = ({
-  selectedChain = defaultChain,
-  onChainSelect,
+  selectedChain: propSelectedChain,
+  onChainSelect: propOnChainSelect,
   displayName = false,
   chainsToShow = chainList,
+  storeType,
 }) => {
-  // State for the icon currently being displayed.
+  // Get store values and setters if storeType is provided
+  const sourceChain = useWeb3Store((state) => state.sourceChain);
+  const destinationChain = useWeb3Store((state) => state.destinationChain);
+  const setSourceChain = useWeb3Store((state) => state.setSourceChain);
+  const setDestinationChain = useWeb3Store(
+    (state) => state.setDestinationChain,
+  );
+
+  // Determine the chain to display (from store)
+  const selectedChain = storeType
+    ? storeType === "source"
+      ? sourceChain
+      : destinationChain
+    : propSelectedChain || defaultSourceChain;
+
+  // State for the icon currently being displayed
   const [displayedChain, setDisplayedChain] = useState<Chain>(selectedChain);
-  // State for the icon's opacity.
+  // State for the icon's opacity
   const [opacity, setOpacity] = useState(1);
   // State for background transition
   const [showRipple, setShowRipple] = useState(false);
@@ -36,6 +54,21 @@ export const SelectChainButton: React.FC<SelectChainButtonProps> = ({
   const [fontColor, setFontColor] = useState(
     selectedChain.fontColor || "#FFFFFF",
   );
+
+  // Handle chain selection based on whether we're using the store or props
+  const handleChainSelect = (chain: Chain) => {
+    if (storeType) {
+      // Update the store
+      if (storeType === "source") {
+        setSourceChain(chain);
+      } else {
+        setDestinationChain(chain);
+      }
+    } else if (propOnChainSelect) {
+      // Use the prop callback (old behavior)
+      propOnChainSelect(chain);
+    }
+  };
 
   // When selectedChain changes, animate the icon change:
   useEffect(() => {
@@ -110,12 +143,13 @@ export const SelectChainButton: React.FC<SelectChainButtonProps> = ({
 
           {/* Chain Icon with opacity transition - Fixed dimensions */}
           <div
-            className="relative z-10 flex-shrink-0"
+            className="relative z-10 flex-shrink-0 transition-all duration-300"
             style={{
               width: "18px",
               height: "18px",
               opacity,
-              transition: "opacity 300ms ease",
+              transition: "opacity 300ms ease, transform 300ms ease",
+              transform: isChanging ? "scale(0.9)" : "scale(1)",
             }}
           >
             <Image
@@ -175,7 +209,7 @@ export const SelectChainButton: React.FC<SelectChainButtonProps> = ({
         {chainsToShow.map((chain) => (
           <DropdownMenuItem
             key={chain.id}
-            onClick={() => onChainSelect && onChainSelect(chain)}
+            onClick={() => handleChainSelect(chain)}
             className="chain-dropdown-item cursor-pointer"
           >
             <div

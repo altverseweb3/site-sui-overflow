@@ -7,7 +7,7 @@ import { TokenInputGroup } from "@/components/ui/TokenInputGroup";
 import { SwapInterface } from "@/components/ui/SwapInterface";
 import { TokenSwitch } from "@/components/ui/TokenSwitch";
 
-const BridgeComponent = () => {
+const BridgeComponent: React.FC = () => {
   const [amount, setAmount] = useState<string>("");
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -36,6 +36,7 @@ const BridgeComponent = () => {
             showSettings={true}
             settingsComponent={settingsButton}
             showChainSelector={true}
+            boxType="source"
           >
             <TokenInputGroup
               variant="amber"
@@ -48,7 +49,12 @@ const BridgeComponent = () => {
           <TokenSwitch />
 
           {/* Receive Box */}
-          <AssetBox title="receive" showSettings={false}>
+          <AssetBox
+            title="receive"
+            showSettings={false}
+            showChainSelector={true}
+            boxType="destination"
+          >
             <TokenInputGroup
               variant="sky"
               amount=""

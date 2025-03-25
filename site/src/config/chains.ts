@@ -140,16 +140,19 @@ export const chains: Record<string, Chain> = {
 export const chainList: Chain[] = Object.values(chains);
 
 // Default chain
-export const defaultChain: Chain = chains.ethereum;
+export const defaultSourceChain: Chain = chains.ethereum;
+export const defaultDestinationChain: Chain = chains.polygon;
 
 // Get chain by ID
 export const getChainById = (id: string): Chain => {
-  return chains[id] || defaultChain;
+  return chains[id] || defaultSourceChain;
 };
 
 // Get chain by chain ID (numeric)
 export const getChainByChainId = (chainId: number): Chain => {
-  return chainList.find((chain) => chain.chainId === chainId) || defaultChain;
+  return (
+    chainList.find((chain) => chain.chainId === chainId) || defaultSourceChain
+  );
 };
 
 // Get testnet chains

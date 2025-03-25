@@ -1,4 +1,4 @@
-import { WalletInfo, WalletType } from "@/types/wallet";
+import { WalletInfo, WalletType } from "@/types/web3";
 
 import useWeb3Store from "@/store/web3Store";
 
