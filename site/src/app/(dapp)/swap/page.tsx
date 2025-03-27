@@ -39,7 +39,7 @@ const SwapComponent: React.FC = () => {
             boxType="source"
           >
             <TokenInputGroup
-              variant="amber"
+              variant="send"
               amount={amount}
               onChange={handleAmountChange}
               showSelectToken={true}
@@ -56,7 +56,7 @@ const SwapComponent: React.FC = () => {
             boxType="destination"
           >
             <TokenInputGroup
-              variant="sky"
+              variant="receive"
               amount=""
               readOnly={true}
               showSelectToken={true}

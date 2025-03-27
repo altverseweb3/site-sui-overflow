@@ -3,7 +3,7 @@ import { SelectTokenButton } from "@/components/ui/SelectTokenButton";
 import { TokenAmountInput } from "@/components/ui/TokenAmountInput";
 
 interface TokenInputGroupProps {
-  variant: "amber" | "sky";
+  variant: "send" | "receive";
   amount: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   showSelectToken: boolean;
