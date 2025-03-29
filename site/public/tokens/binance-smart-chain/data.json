@@ -1,19 +1,6 @@
 [
   {
-    "extract_time": 1743074096.0480058,
-    "id": "chainlink",
-    "symbol": "link",
-    "name": "Chainlink",
-    "contract_address": "0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd",
-    "local_image": "chainlink.png",
-    "alchemy_metadata": {
-      "name": "ChainLink Token",
-      "symbol": "LINK",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "the-open-network",
     "symbol": "ton",
     "name": "Toncoin",
@@ -26,7 +13,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "chainlink",
+    "symbol": "link",
+    "name": "Chainlink",
+    "contract_address": "0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd",
+    "local_image": "chainlink.png",
+    "alchemy_metadata": {
+      "name": "ChainLink Token",
+      "symbol": "LINK",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "mantra-dao",
     "symbol": "om",
     "name": "MANTRA",
@@ -39,7 +39,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "binance-bridged-usdt-bnb-smart-chain",
     "symbol": "bsc-usd",
     "name": "Binance Bridged USDT (BNB Smart Chain)",
@@ -52,7 +52,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "uniswap",
     "symbol": "uni",
     "name": "Uniswap",
@@ -65,7 +65,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "pepe",
     "symbol": "pepe",
     "name": "Pepe",
@@ -78,7 +78,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "aave",
     "symbol": "aave",
     "name": "Aave",
@@ -91,7 +91,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "first-digital-usd",
     "symbol": "fdusd",
     "name": "First Digital USD",
@@ -104,7 +104,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "cosmos",
     "symbol": "atom",
     "name": "Cosmos Hub",
@@ -117,7 +117,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "lombard-staked-btc",
     "symbol": "lbtc",
     "name": "Lombard Staked BTC",
@@ -130,7 +130,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "fasttoken",
     "symbol": "ftn",
     "name": "Fasttoken",
@@ -143,20 +143,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "fetch-ai",
-    "symbol": "fet",
-    "name": "Artificial Superintelligence Alliance",
-    "contract_address": "0x031b41e504677879370e9dbcf937283a8691fa7f",
-    "local_image": "fetch-ai.png",
-    "alchemy_metadata": {
-      "name": "Fetch",
-      "symbol": "FET",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "solv-btc",
     "symbol": "solvbtc",
     "name": "Solv Protocol SolvBTC",
@@ -169,7 +156,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "fetch-ai",
+    "symbol": "fet",
+    "name": "Artificial Superintelligence Alliance",
+    "contract_address": "0x031b41e504677879370e9dbcf937283a8691fa7f",
+    "local_image": "fetch-ai.png",
+    "alchemy_metadata": {
+      "name": "Fetch",
+      "symbol": "FET",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "binance-peg-weth",
     "symbol": "weth",
     "name": "Binance-Peg WETH",
@@ -182,20 +182,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "bonk",
-    "symbol": "bonk",
-    "name": "Bonk",
-    "contract_address": "0xa697e272a73744b343528c3bc4702f2565b2f422",
-    "local_image": "bonk.png",
-    "alchemy_metadata": {
-      "name": "Bonk",
-      "symbol": "Bonk",
-      "decimals": 5
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "dexe",
     "symbol": "dexe",
     "name": "DeXe",
@@ -208,7 +195,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "bonk",
+    "symbol": "bonk",
+    "name": "Bonk",
+    "contract_address": "0xa697e272a73744b343528c3bc4702f2565b2f422",
+    "local_image": "bonk.png",
+    "alchemy_metadata": {
+      "name": "Bonk",
+      "symbol": "Bonk",
+      "decimals": 5
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "injective-protocol",
     "symbol": "inj",
     "name": "Injective",
@@ -221,7 +221,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "solv-protocol-solvbtc-bbn",
     "symbol": "solvbtc.bbn",
     "name": "Solv Protocol SolvBTC.BBN",
@@ -234,20 +234,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "wbnb",
-    "symbol": "wbnb",
-    "name": "Wrapped BNB",
-    "contract_address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
-    "local_image": "wbnb.png",
-    "alchemy_metadata": {
-      "name": "Wrapped BNB",
-      "symbol": "WBNB",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "binance-bridged-usdc-bnb-smart-chain",
     "symbol": "usdc",
     "name": "Binance Bridged USDC (BNB Smart Chain)",
@@ -260,20 +247,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "pancakeswap-token",
-    "symbol": "cake",
-    "name": "PancakeSwap",
-    "contract_address": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
-    "local_image": "pancakeswap-token.png",
+    "extract_time": 1743243120.514049,
+    "id": "wbnb",
+    "symbol": "wbnb",
+    "name": "Wrapped BNB",
+    "contract_address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "local_image": "wbnb.png",
     "alchemy_metadata": {
-      "name": "PancakeSwap Token",
-      "symbol": "Cake",
+      "name": "Wrapped BNB",
+      "symbol": "WBNB",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "bittorrent",
     "symbol": "btt",
     "name": "BitTorrent",
@@ -286,20 +273,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "floki",
-    "symbol": "floki",
-    "name": "FLOKI",
-    "contract_address": "0xfb5b838b6cfeedc2873ab27866079ac55363d37e",
-    "local_image": "floki.png",
-    "alchemy_metadata": {
-      "name": "FLOKI",
-      "symbol": "FLOKI",
-      "decimals": 9
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "usdx-money-usdx",
     "symbol": "usdx",
     "name": "Stables Labs USDX",
@@ -312,7 +286,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "pancakeswap-token",
+    "symbol": "cake",
+    "name": "PancakeSwap",
+    "contract_address": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+    "local_image": "pancakeswap-token.png",
+    "alchemy_metadata": {
+      "name": "PancakeSwap Token",
+      "symbol": "Cake",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "floki",
+    "symbol": "floki",
+    "name": "FLOKI",
+    "contract_address": "0xfb5b838b6cfeedc2873ab27866079ac55363d37e",
+    "local_image": "floki.png",
+    "alchemy_metadata": {
+      "name": "FLOKI",
+      "symbol": "FLOKI",
+      "decimals": 9
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "renzo-restaked-eth",
     "symbol": "ezeth",
     "name": "Renzo Restaked ETH",
@@ -325,59 +325,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "axie-infinity",
-    "symbol": "axs",
-    "name": "Axie Infinity",
-    "contract_address": "0x715d400f88c167884bbcc41c5fea407ed4d2f8a0",
-    "local_image": "axie-infinity.png",
-    "alchemy_metadata": {
-      "name": "Axie Infinity Shard",
-      "symbol": "AXS",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "beam-2",
-    "symbol": "beam",
-    "name": "Beam",
-    "contract_address": "0x62d0a8458ed7719fdaf978fe5929c6d342b0bfce",
-    "local_image": "beam-2.png",
-    "alchemy_metadata": {
-      "name": "Beam",
-      "symbol": "BEAM",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "binance-peg-dogecoin",
-    "symbol": "doge",
-    "name": "Binance-Peg Dogecoin",
-    "contract_address": "0xba2ae424d960c26247dd6c32edc70b295c744c43",
-    "local_image": "binance-peg-dogecoin.png",
-    "alchemy_metadata": {
-      "name": "Dogecoin",
-      "symbol": "DOGE",
-      "decimals": 8
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "pumpbtc",
-    "symbol": "pumpbtc",
-    "name": "pumpBTC",
-    "contract_address": "0xf9c4ff105803a77ecb5dae300871ad76c2794fa4",
-    "local_image": "pumpbtc.png",
-    "alchemy_metadata": {
-      "name": "pumpBTC",
-      "symbol": "pumpBTC",
-      "decimals": 8
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "true-usd",
     "symbol": "tusd",
     "name": "TrueUSD",
@@ -390,20 +338,46 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "pendle",
-    "symbol": "pendle",
-    "name": "Pendle",
-    "contract_address": "0xb3ed0a426155b79b898849803e3b36552f7ed507",
-    "local_image": "pendle.png",
+    "extract_time": 1743243120.514049,
+    "id": "axie-infinity",
+    "symbol": "axs",
+    "name": "Axie Infinity",
+    "contract_address": "0x715d400f88c167884bbcc41c5fea407ed4d2f8a0",
+    "local_image": "axie-infinity.png",
     "alchemy_metadata": {
-      "name": "Pendle",
-      "symbol": "PENDLE",
+      "name": "Axie Infinity Shard",
+      "symbol": "AXS",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "pumpbtc",
+    "symbol": "pumpbtc",
+    "name": "pumpBTC",
+    "contract_address": "0xf9c4ff105803a77ecb5dae300871ad76c2794fa4",
+    "local_image": "pumpbtc.png",
+    "alchemy_metadata": {
+      "name": "pumpBTC",
+      "symbol": "pumpBTC",
+      "decimals": 8
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "binance-peg-dogecoin",
+    "symbol": "doge",
+    "name": "Binance-Peg Dogecoin",
+    "contract_address": "0xba2ae424d960c26247dd6c32edc70b295c744c43",
+    "local_image": "binance-peg-dogecoin.png",
+    "alchemy_metadata": {
+      "name": "Dogecoin",
+      "symbol": "DOGE",
+      "decimals": 8
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "apenft",
     "symbol": "nft",
     "name": "APENFT",
@@ -416,7 +390,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "pendle",
+    "symbol": "pendle",
+    "name": "Pendle",
+    "contract_address": "0xb3ed0a426155b79b898849803e3b36552f7ed507",
+    "local_image": "pendle.png",
+    "alchemy_metadata": {
+      "name": "Pendle",
+      "symbol": "PENDLE",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "beam-2",
+    "symbol": "beam",
+    "name": "Beam",
+    "contract_address": "0x62d0a8458ed7719fdaf978fe5929c6d342b0bfce",
+    "local_image": "beam-2.png",
+    "alchemy_metadata": {
+      "name": "Beam",
+      "symbol": "BEAM",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "matic-network",
     "symbol": "matic",
     "name": "Polygon",
@@ -429,33 +429,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "compound-governance-token",
-    "symbol": "comp",
-    "name": "Compound",
-    "contract_address": "0x52ce071bd9b1c4b00a0b92d298c512478cad67e8",
-    "local_image": "compound-governance-token.png",
-    "alchemy_metadata": {
-      "name": "Compound Coin",
-      "symbol": "COMP",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "axelar",
-    "symbol": "axl",
-    "name": "Axelar",
-    "contract_address": "0x8b1f4432f943c465a973fedc6d7aa50fc96f1f65",
-    "local_image": "axelar.png",
-    "alchemy_metadata": {
-      "name": "Axelar",
-      "symbol": "AXL",
-      "decimals": 6
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "trust-wallet-token",
     "symbol": "twt",
     "name": "Trust Wallet",
@@ -468,59 +442,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "chain-2",
-    "symbol": "xcn",
-    "name": "Onyxcoin",
-    "contract_address": "0x7324c7c0d95cebc73eea7e85cbaac0dbdf88a05b",
-    "local_image": "chain-2.png",
+    "extract_time": 1743243120.514049,
+    "id": "compound-governance-token",
+    "symbol": "comp",
+    "name": "Compound",
+    "contract_address": "0x52ce071bd9b1c4b00a0b92d298c512478cad67e8",
+    "local_image": "compound-governance-token.png",
     "alchemy_metadata": {
-      "name": "Chain",
-      "symbol": "XCN",
+      "name": "Compound Coin",
+      "symbol": "COMP",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "layerzero",
-    "symbol": "zro",
-    "name": "LayerZero",
-    "contract_address": "0x6985884c4392d348587b19cb9eaaf157f13271cd",
-    "local_image": "layerzero.png",
+    "extract_time": 1743243120.514049,
+    "id": "axelar",
+    "symbol": "axl",
+    "name": "Axelar",
+    "contract_address": "0x8b1f4432f943c465a973fedc6d7aa50fc96f1f65",
+    "local_image": "axelar.png",
     "alchemy_metadata": {
-      "name": "LayerZero",
-      "symbol": "ZRO",
-      "decimals": 18
+      "name": "Axelar",
+      "symbol": "AXL",
+      "decimals": 6
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "cheems-token",
-    "symbol": "cheems",
-    "name": "Cheems Token",
-    "contract_address": "0x0df0587216a4a1bb7d5082fdc491d93d2dd4b413",
-    "local_image": "cheems-token.png",
-    "alchemy_metadata": {
-      "name": "Cheems",
-      "symbol": "Cheems",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "lorenzo-stbtc",
-    "symbol": "stbtc",
-    "name": "Lorenzo stBTC",
-    "contract_address": "0xf6718b2701d4a6498ef77d7c152b2137ab28b8a3",
-    "local_image": "lorenzo-stbtc.png",
-    "alchemy_metadata": {
-      "name": "Lorenzo stBTC",
-      "symbol": "stBTC",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "frax",
     "symbol": "frax",
     "name": "Frax",
@@ -533,20 +481,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "aioz-network",
-    "symbol": "aioz",
-    "name": "AIOZ Network",
-    "contract_address": "0x33d08d8c7a168333a85285a68c0042b39fc3741d",
-    "local_image": "aioz-network.png",
+    "extract_time": 1743243120.514049,
+    "id": "lorenzo-stbtc",
+    "symbol": "stbtc",
+    "name": "Lorenzo stBTC",
+    "contract_address": "0xf6718b2701d4a6498ef77d7c152b2137ab28b8a3",
+    "local_image": "lorenzo-stbtc.png",
     "alchemy_metadata": {
-      "name": "AIOZ Network",
-      "symbol": "AIOZ",
+      "name": "Lorenzo stBTC",
+      "symbol": "stBTC",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "cheems-token",
+    "symbol": "cheems",
+    "name": "Cheems Token",
+    "contract_address": "0x0df0587216a4a1bb7d5082fdc491d93d2dd4b413",
+    "local_image": "cheems-token.png",
+    "alchemy_metadata": {
+      "name": "Cheems",
+      "symbol": "Cheems",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "binance-peg-busd",
     "symbol": "busd",
     "name": "Binance-Peg BUSD",
@@ -559,20 +520,46 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "zetachain",
-    "symbol": "zeta",
-    "name": "ZetaChain",
-    "contract_address": "0x0000028a2eb8346cd5c0267856ab7594b7a55308",
-    "local_image": "zetachain.png",
+    "extract_time": 1743243120.514049,
+    "id": "chain-2",
+    "symbol": "xcn",
+    "name": "Onyxcoin",
+    "contract_address": "0x7324c7c0d95cebc73eea7e85cbaac0dbdf88a05b",
+    "local_image": "chain-2.png",
     "alchemy_metadata": {
-      "name": "Zeta",
-      "symbol": "ZETA",
+      "name": "Chain",
+      "symbol": "XCN",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "aioz-network",
+    "symbol": "aioz",
+    "name": "AIOZ Network",
+    "contract_address": "0x33d08d8c7a168333a85285a68c0042b39fc3741d",
+    "local_image": "aioz-network.png",
+    "alchemy_metadata": {
+      "name": "AIOZ Network",
+      "symbol": "AIOZ",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "layerzero",
+    "symbol": "zro",
+    "name": "LayerZero",
+    "contract_address": "0x6985884c4392d348587b19cb9eaaf157f13271cd",
+    "local_image": "layerzero.png",
+    "alchemy_metadata": {
+      "name": "LayerZero",
+      "symbol": "ZRO",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "1inch",
     "symbol": "1inch",
     "name": "1inch",
@@ -585,46 +572,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "safepal",
-    "symbol": "sfp",
-    "name": "SafePal",
-    "contract_address": "0xd41fdb03ba84762dd66a0af1a6c8540ff1ba5dfb",
-    "local_image": "safepal.png",
-    "alchemy_metadata": {
-      "name": "SafePal Token",
-      "symbol": "SFP",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "usdd",
-    "symbol": "usdd",
-    "name": "USDD",
-    "contract_address": "0x392004bee213f1ff580c867359c246924f21e6ad",
-    "local_image": "usdd.png",
-    "alchemy_metadata": {
-      "name": "Decentralized USD",
-      "symbol": "USDD",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "frax-ether",
-    "symbol": "frxeth",
-    "name": "Frax Ether",
-    "contract_address": "0x64048a7eecf3a2f1ba9e144aac3d7db6e58f555e",
-    "local_image": "frax-ether.png",
-    "alchemy_metadata": {
-      "name": "Frax Ether",
-      "symbol": "frxETH",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "quorium",
     "symbol": "qgold",
     "name": "Quorium",
@@ -637,7 +585,46 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "safepal",
+    "symbol": "sfp",
+    "name": "SafePal",
+    "contract_address": "0xd41fdb03ba84762dd66a0af1a6c8540ff1ba5dfb",
+    "local_image": "safepal.png",
+    "alchemy_metadata": {
+      "name": "SafePal Token",
+      "symbol": "SFP",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "frax-ether",
+    "symbol": "frxeth",
+    "name": "Frax Ether",
+    "contract_address": "0x64048a7eecf3a2f1ba9e144aac3d7db6e58f555e",
+    "local_image": "frax-ether.png",
+    "alchemy_metadata": {
+      "name": "Frax Ether",
+      "symbol": "frxETH",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "usdd",
+    "symbol": "usdd",
+    "name": "USDD",
+    "contract_address": "0x392004bee213f1ff580c867359c246924f21e6ad",
+    "local_image": "usdd.png",
+    "alchemy_metadata": {
+      "name": "Decentralized USD",
+      "symbol": "USDD",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "zilliqa",
     "symbol": "zil",
     "name": "Zilliqa",
@@ -650,46 +637,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "chex-token",
-    "symbol": "chex",
-    "name": "CHEX Token",
-    "contract_address": "0x9ce84f6a69986a83d92c324df10bc8e64771030f",
-    "local_image": "chex-token.png",
+    "extract_time": 1743243120.514049,
+    "id": "zetachain",
+    "symbol": "zeta",
+    "name": "ZetaChain",
+    "contract_address": "0x0000028a2eb8346cd5c0267856ab7594b7a55308",
+    "local_image": "zetachain.png",
     "alchemy_metadata": {
-      "name": "Chintai Exchange Token",
-      "symbol": "CHEX",
+      "name": "Zeta",
+      "symbol": "ZETA",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "baby-doge-coin",
-    "symbol": "babydoge",
-    "name": "Baby Doge Coin",
-    "contract_address": "0xc748673057861a797275cd8a068abb95a902e8de",
-    "local_image": "baby-doge-coin.png",
-    "alchemy_metadata": {
-      "name": "Baby Doge Coin",
-      "symbol": "BabyDoge",
-      "decimals": 9
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "oasis-network",
-    "symbol": "rose",
-    "name": "Oasis",
-    "contract_address": "0xf00600ebc7633462bc4f9c61ea2ce99f5aaebd4a",
-    "local_image": "oasis-network.png",
-    "alchemy_metadata": {
-      "name": "Wrapped ROSE",
-      "symbol": "wROSE",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "mask-network",
     "symbol": "mask",
     "name": "Mask Network",
@@ -702,59 +663,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "stargate-finance",
-    "symbol": "stg",
-    "name": "Stargate Finance",
-    "contract_address": "0xb0d502e938ed5f4df2e681fe6e419ff29631d62b",
-    "local_image": "stargate-finance.png",
-    "alchemy_metadata": {
-      "name": "StargateToken",
-      "symbol": "STG",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "ai-companions",
-    "symbol": "aic",
-    "name": "AI Companions",
-    "contract_address": "0xbe6ad1eb9876cf3d3f9b85feecfb400298e80143",
-    "local_image": "ai-companions.png",
-    "alchemy_metadata": {
-      "name": "AI Companions",
-      "symbol": "AIC",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "bnb48-club-token",
-    "symbol": "koge",
-    "name": "KOGE",
-    "contract_address": "0xe6df05ce8c8301223373cf5b969afcb1498c5528",
-    "local_image": "bnb48-club-token.png",
-    "alchemy_metadata": {
-      "name": "BNB48 Club Token",
-      "symbol": "KOGE",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "frax-share",
-    "symbol": "fxs",
-    "name": "Frax Share",
-    "contract_address": "0xe48a3d7d0bc88d552f730b62c006bc925eadb9ee",
-    "local_image": "frax-share.png",
-    "alchemy_metadata": {
-      "name": "Frax Share",
-      "symbol": "FXS",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "usda-2",
     "symbol": "usda",
     "name": "USDa",
@@ -767,7 +676,85 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "baby-doge-coin",
+    "symbol": "babydoge",
+    "name": "Baby Doge Coin",
+    "contract_address": "0xc748673057861a797275cd8a068abb95a902e8de",
+    "local_image": "baby-doge-coin.png",
+    "alchemy_metadata": {
+      "name": "Baby Doge Coin",
+      "symbol": "BabyDoge",
+      "decimals": 9
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "stargate-finance",
+    "symbol": "stg",
+    "name": "Stargate Finance",
+    "contract_address": "0xb0d502e938ed5f4df2e681fe6e419ff29631d62b",
+    "local_image": "stargate-finance.png",
+    "alchemy_metadata": {
+      "name": "StargateToken",
+      "symbol": "STG",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "bnb48-club-token",
+    "symbol": "koge",
+    "name": "KOGE",
+    "contract_address": "0xe6df05ce8c8301223373cf5b969afcb1498c5528",
+    "local_image": "bnb48-club-token.png",
+    "alchemy_metadata": {
+      "name": "BNB48 Club Token",
+      "symbol": "KOGE",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "oasis-network",
+    "symbol": "rose",
+    "name": "Oasis",
+    "contract_address": "0xf00600ebc7633462bc4f9c61ea2ce99f5aaebd4a",
+    "local_image": "oasis-network.png",
+    "alchemy_metadata": {
+      "name": "Wrapped ROSE",
+      "symbol": "wROSE",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "chex-token",
+    "symbol": "chex",
+    "name": "CHEX Token",
+    "contract_address": "0x9ce84f6a69986a83d92c324df10bc8e64771030f",
+    "local_image": "chex-token.png",
+    "alchemy_metadata": {
+      "name": "Chintai Exchange Token",
+      "symbol": "CHEX",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "ai-companions",
+    "symbol": "aic",
+    "name": "AI Companions",
+    "contract_address": "0xbe6ad1eb9876cf3d3f9b85feecfb400298e80143",
+    "local_image": "ai-companions.png",
+    "alchemy_metadata": {
+      "name": "AI Companions",
+      "symbol": "AIC",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "ankr",
     "symbol": "ankr",
     "name": "Ankr Network",
@@ -780,7 +767,20 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "frax-share",
+    "symbol": "fxs",
+    "name": "Frax Share",
+    "contract_address": "0xe48a3d7d0bc88d552f730b62c006bc925eadb9ee",
+    "local_image": "frax-share.png",
+    "alchemy_metadata": {
+      "name": "Frax Share",
+      "symbol": "FXS",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "staked-frax-ether",
     "symbol": "sfrxeth",
     "name": "Staked Frax Ether",
@@ -793,33 +793,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "aelf",
-    "symbol": "elf",
-    "name": "aelf",
-    "contract_address": "0xa3f020a5c92e15be13caf0ee5c95cf79585eecc9",
-    "local_image": "aelf.png",
-    "alchemy_metadata": {
-      "name": "ELF Token",
-      "symbol": "ELF",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "woo-network",
-    "symbol": "woo",
-    "name": "WOO",
-    "contract_address": "0x4691937a7508860f876c9c0a2a617e7d9e945d4b",
-    "local_image": "woo-network.png",
-    "alchemy_metadata": {
-      "name": "Wootrade Network",
-      "symbol": "WOO",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "trip",
     "symbol": "trip",
     "name": "Trip",
@@ -832,7 +806,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "gmt-token",
     "symbol": "gomining",
     "name": "GoMining Token",
@@ -845,7 +819,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "aelf",
+    "symbol": "elf",
+    "name": "aelf",
+    "contract_address": "0xa3f020a5c92e15be13caf0ee5c95cf79585eecc9",
+    "local_image": "aelf.png",
+    "alchemy_metadata": {
+      "name": "ELF Token",
+      "symbol": "ELF",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "woo-network",
+    "symbol": "woo",
+    "name": "WOO",
+    "contract_address": "0x4691937a7508860f876c9c0a2a617e7d9e945d4b",
+    "local_image": "woo-network.png",
+    "alchemy_metadata": {
+      "name": "Wootrade Network",
+      "symbol": "WOO",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "acet-token",
     "symbol": "act",
     "name": "Acet",
@@ -858,7 +858,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "wrapped-beacon-eth",
     "symbol": "wbeth",
     "name": "Wrapped Beacon ETH",
@@ -871,20 +871,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "stepn",
-    "symbol": "gmt",
-    "name": "GMT",
-    "contract_address": "0x3019bf2a2ef8040c242c9a4c5c4bd4c81678b2a1",
-    "local_image": "stepn.png",
-    "alchemy_metadata": {
-      "name": "Green Metaverse Token",
-      "symbol": "GMT",
-      "decimals": 8
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "binance-peg-sol",
     "symbol": "sol",
     "name": "Binance-Peg SOL",
@@ -897,33 +884,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "mubarak",
-    "symbol": "mubarak",
-    "name": "Mubarak",
-    "contract_address": "0x5c85d6c6825ab4032337f11ee92a72df936b46f6",
-    "local_image": "mubarak.png",
-    "alchemy_metadata": {
-      "name": "mubarak",
-      "symbol": "mubarak",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "world-mobile-token",
-    "symbol": "wmtx",
-    "name": "World Mobile Token",
-    "contract_address": "0xdbb5cf12408a3ac17d668037ce289f9ea75439d7",
-    "local_image": "world-mobile-token.png",
-    "alchemy_metadata": {
-      "name": "WorldMobileToken",
-      "symbol": "WMTX",
-      "decimals": 6
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "polyhedra-network",
     "symbol": "zkj",
     "name": "Polyhedra Network",
@@ -936,7 +897,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "world-mobile-token",
+    "symbol": "wmtx",
+    "name": "World Mobile Token",
+    "contract_address": "0xdbb5cf12408a3ac17d668037ce289f9ea75439d7",
+    "local_image": "world-mobile-token.png",
+    "alchemy_metadata": {
+      "name": "WorldMobileToken",
+      "symbol": "WMTX",
+      "decimals": 6
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "stepn",
+    "symbol": "gmt",
+    "name": "GMT",
+    "contract_address": "0x3019bf2a2ef8040c242c9a4c5c4bd4c81678b2a1",
+    "local_image": "stepn.png",
+    "alchemy_metadata": {
+      "name": "Green Metaverse Token",
+      "symbol": "GMT",
+      "decimals": 8
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "project-galaxy",
     "symbol": "gal",
     "name": "Galxe",
@@ -949,85 +936,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "swipe",
-    "symbol": "sxp",
-    "name": "Solar",
-    "contract_address": "0x47bead2563dcbf3bf2c9407fea4dc236faba485a",
-    "local_image": "swipe.png",
-    "alchemy_metadata": {
-      "name": "Swipe",
-      "symbol": "SXP",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "sushi",
-    "symbol": "sushi",
-    "name": "Sushi",
-    "contract_address": "0x947950bcc74888a40ffa2593c5798f11fc9124c4",
-    "local_image": "sushi.png",
-    "alchemy_metadata": {
-      "name": "SushiToken",
-      "symbol": "SUSHI",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "zignaly",
-    "symbol": "zig",
-    "name": "ZIGChain",
-    "contract_address": "0x8c907e0a72c3d55627e853f4ec6a96b0c8771145",
-    "local_image": "zignaly.png",
-    "alchemy_metadata": {
-      "name": "ZigCoin",
-      "symbol": "ZIG",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "delysium",
-    "symbol": "agi",
-    "name": "Delysium",
-    "contract_address": "0x818835503f55283cd51a4399f595e295a9338753",
-    "local_image": "delysium.png",
-    "alchemy_metadata": {
-      "name": "AGI Token",
-      "symbol": "AGI",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "alchemy-pay",
-    "symbol": "ach",
-    "name": "Alchemy Pay",
-    "contract_address": "0xbc7d6b50616989655afd682fb42743507003056d",
-    "local_image": "alchemy-pay.png",
-    "alchemy_metadata": {
-      "name": "Alchemy",
-      "symbol": "ACH",
-      "decimals": 8
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "altlayer",
-    "symbol": "alt",
-    "name": "AltLayer",
-    "contract_address": "0x8457ca5040ad67fdebbcc8edce889a335bc0fbfb",
-    "local_image": "altlayer.png",
-    "alchemy_metadata": {
-      "name": "AltLayer Token",
-      "symbol": "ALT",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "astherus-usdf",
     "symbol": "usdf",
     "name": "Astherus USDF",
@@ -1040,59 +949,7 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "g-token",
-    "symbol": "g",
-    "name": "Gravity",
-    "contract_address": "0x9c7beba8f6ef6643abd725e45a4e8387ef260649",
-    "local_image": "g-token.png",
-    "alchemy_metadata": {
-      "name": "Gravity",
-      "symbol": "G",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "non-playable-coin",
-    "symbol": "npc",
-    "name": "Non-Playable Coin",
-    "contract_address": "0xfebfa339e44c28e2aa9e62ea1027c9cb4e378605",
-    "local_image": "non-playable-coin.png",
-    "alchemy_metadata": {
-      "name": "Non-Playable Coin",
-      "symbol": "NPC",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "paal-ai",
-    "symbol": "paal",
-    "name": "PAAL AI",
-    "contract_address": "0xbb1b031c591235408755ff4e0739cb88c5cf2507",
-    "local_image": "paal-ai.png",
-    "alchemy_metadata": {
-      "name": "PAAL AI",
-      "symbol": "$PAAL",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "nkyc-token",
-    "symbol": "nkyc",
-    "name": "NKYC Token",
-    "contract_address": "0x59769630b236398c2471eb26e6a529448030d94f",
-    "local_image": "nkyc-token.png",
-    "alchemy_metadata": {
-      "name": "NONKYC",
-      "symbol": "NKYC",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "bitdca",
     "symbol": "bdca",
     "name": "BitDCA",
@@ -1105,7 +962,59 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "swipe",
+    "symbol": "sxp",
+    "name": "Solar",
+    "contract_address": "0x47bead2563dcbf3bf2c9407fea4dc236faba485a",
+    "local_image": "swipe.png",
+    "alchemy_metadata": {
+      "name": "Swipe",
+      "symbol": "SXP",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "web3shot",
+    "symbol": "w3s",
+    "name": "Web3Shot",
+    "contract_address": "0x71d03f5cbf039febcc6ee8dbe20bc9ba3ea874fe",
+    "local_image": "web3shot.png",
+    "alchemy_metadata": {
+      "name": "Web3Shot",
+      "symbol": "W3S",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "nkyc-token",
+    "symbol": "nkyc",
+    "name": "NKYC Token",
+    "contract_address": "0x59769630b236398c2471eb26e6a529448030d94f",
+    "local_image": "nkyc-token.png",
+    "alchemy_metadata": {
+      "name": "NONKYC",
+      "symbol": "NKYC",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "sushi",
+    "symbol": "sushi",
+    "name": "Sushi",
+    "contract_address": "0x947950bcc74888a40ffa2593c5798f11fc9124c4",
+    "local_image": "sushi.png",
+    "alchemy_metadata": {
+      "name": "SushiToken",
+      "symbol": "SUSHI",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "astherus-staked-bnb",
     "symbol": "asbnb",
     "name": "Astherus Staked BNB",
@@ -1118,20 +1027,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "vicicoin",
-    "symbol": "vcnt",
-    "name": "ViciCoin",
-    "contract_address": "0xc6bdfc4f2e90196738873e824a9efa03f7c64176",
-    "local_image": "vicicoin.png",
+    "extract_time": 1743243120.514049,
+    "id": "zignaly",
+    "symbol": "zig",
+    "name": "ZIGChain",
+    "contract_address": "0x8c907e0a72c3d55627e853f4ec6a96b0c8771145",
+    "local_image": "zignaly.png",
     "alchemy_metadata": {
-      "name": "ViciCoin",
-      "symbol": "VCNT",
+      "name": "ZigCoin",
+      "symbol": "ZIG",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
+    "id": "alchemy-pay",
+    "symbol": "ach",
+    "name": "Alchemy Pay",
+    "contract_address": "0xbc7d6b50616989655afd682fb42743507003056d",
+    "local_image": "alchemy-pay.png",
+    "alchemy_metadata": {
+      "name": "Alchemy",
+      "symbol": "ACH",
+      "decimals": 8
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
     "id": "h2o-dao",
     "symbol": "h2o",
     "name": "H2O Dao",
@@ -1144,20 +1066,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "space-id",
-    "symbol": "id",
-    "name": "SPACE ID",
-    "contract_address": "0x2dff88a56767223a5529ea5960da7a3f5f766406",
-    "local_image": "space-id.png",
+    "extract_time": 1743243120.514049,
+    "id": "ignition-fbtc",
+    "symbol": "fbtc",
+    "name": "Function ƒBTC",
+    "contract_address": "0xc96de26018a54d51c097160568752c4e3bd6c364",
+    "local_image": "ignition-fbtc.png",
     "alchemy_metadata": {
-      "name": "SPACE ID",
-      "symbol": "ID",
+      "name": "Fire Bitcoin",
+      "symbol": "FBTC",
+      "decimals": 8
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "vicicoin",
+    "symbol": "vcnt",
+    "name": "ViciCoin",
+    "contract_address": "0xc6bdfc4f2e90196738873e824a9efa03f7c64176",
+    "local_image": "vicicoin.png",
+    "alchemy_metadata": {
+      "name": "ViciCoin",
+      "symbol": "VCNT",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "prometeus",
     "symbol": "prom",
     "name": "Prom",
@@ -1170,111 +1105,33 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "swftcoin",
-    "symbol": "swftc",
-    "name": "SWFTCOIN",
-    "contract_address": "0xe64e30276c2f826febd3784958d6da7b55dfbad3",
-    "local_image": "swftcoin.png",
+    "extract_time": 1743243120.514049,
+    "id": "g-token",
+    "symbol": "g",
+    "name": "Gravity",
+    "contract_address": "0x9c7beba8f6ef6643abd725e45a4e8387ef260649",
+    "local_image": "g-token.png",
     "alchemy_metadata": {
-      "name": "SwftCoin",
-      "symbol": "SWFTC",
+      "name": "Gravity",
+      "symbol": "G",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "solo-coin",
-    "symbol": "solo",
-    "name": "Sologenic",
-    "contract_address": "0xc2c28b58db223da89b567a0a98197fc17c115148",
-    "local_image": "solo-coin.png",
+    "extract_time": 1743243120.514049,
+    "id": "altlayer",
+    "symbol": "alt",
+    "name": "AltLayer",
+    "contract_address": "0x8457ca5040ad67fdebbcc8edce889a335bc0fbfb",
+    "local_image": "altlayer.png",
     "alchemy_metadata": {
-      "name": "Sologenic",
-      "symbol": "SOLO",
-      "decimals": 15
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "proton",
-    "symbol": "xpr",
-    "name": "XPR Network",
-    "contract_address": "0x5de3939b2f811a61d830e6f52d13b066881412ab",
-    "local_image": "proton.png",
-    "alchemy_metadata": {
-      "name": "Proton",
-      "symbol": "XPR",
-      "decimals": 4
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "venus",
-    "symbol": "xvs",
-    "name": "Venus",
-    "contract_address": "0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63",
-    "local_image": "venus.png",
-    "alchemy_metadata": {
-      "name": "Venus",
-      "symbol": "XVS",
+      "name": "AltLayer Token",
+      "symbol": "ALT",
       "decimals": 18
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "velo",
-    "symbol": "velo",
-    "name": "Velo",
-    "contract_address": "0xf486ad071f3bee968384d2e39e2d8af0fcf6fd46",
-    "local_image": "velo.png",
-    "alchemy_metadata": {
-      "name": "VELO",
-      "symbol": "VELO",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "everipedia",
-    "symbol": "iq",
-    "name": "IQ",
-    "contract_address": "0x0e37d70b51ffa2b98b4d34a5712c5291115464e3",
-    "local_image": "everipedia.png",
-    "alchemy_metadata": {
-      "name": "Everipedia IQ",
-      "symbol": "IQ",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "global-commercial-business",
-    "symbol": "gcb",
-    "name": "Global Commercial Business",
-    "contract_address": "0x84f70be4deb029d5f8aacbeacc74c4dc10737342",
-    "local_image": "global-commercial-business.png",
-    "alchemy_metadata": {
-      "name": "GCB",
-      "symbol": "GCB",
-      "decimals": 18
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
-    "id": "chromaway",
-    "symbol": "chr",
-    "name": "Chromia",
-    "contract_address": "0xf9cec8d50f6c8ad3fb6dccec577e05aa32b224fe",
-    "local_image": "chromaway.png",
-    "alchemy_metadata": {
-      "name": "Chroma",
-      "symbol": "CHR",
-      "decimals": 6
-    }
-  },
-  {
-    "extract_time": 1743074096.0480058,
+    "extract_time": 1743243120.514049,
     "id": "crvusd",
     "symbol": "crvusd",
     "name": "crvUSD",
@@ -1287,15 +1144,158 @@
     }
   },
   {
-    "extract_time": 1743074096.0480058,
-    "id": "yield-guild-games",
-    "symbol": "ygg",
-    "name": "Yield Guild Games",
-    "contract_address": "0x13ab6739368a4e4abf24695bf52959224367391f",
-    "local_image": "yield-guild-games.png",
+    "extract_time": 1743243120.514049,
+    "id": "delysium",
+    "symbol": "agi",
+    "name": "Delysium",
+    "contract_address": "0x818835503f55283cd51a4399f595e295a9338753",
+    "local_image": "delysium.png",
     "alchemy_metadata": {
-      "name": "Yield Guild Games Token",
-      "symbol": "YGG",
+      "name": "AGI Token",
+      "symbol": "AGI",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "metfi-2",
+    "symbol": "metfi",
+    "name": "MetFi",
+    "contract_address": "0x3e7f1039896454b9cb27c53cc7383e1ab9d9512a",
+    "local_image": "metfi-2.png",
+    "alchemy_metadata": {
+      "name": "MetFi",
+      "symbol": "METFI",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "swftcoin",
+    "symbol": "swftc",
+    "name": "SWFTCOIN",
+    "contract_address": "0xe64e30276c2f826febd3784958d6da7b55dfbad3",
+    "local_image": "swftcoin.png",
+    "alchemy_metadata": {
+      "name": "SwftCoin",
+      "symbol": "SWFTC",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "proton",
+    "symbol": "xpr",
+    "name": "XPR Network",
+    "contract_address": "0x5de3939b2f811a61d830e6f52d13b066881412ab",
+    "local_image": "proton.png",
+    "alchemy_metadata": {
+      "name": "Proton",
+      "symbol": "XPR",
+      "decimals": 4
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "velo",
+    "symbol": "velo",
+    "name": "Velo",
+    "contract_address": "0xf486ad071f3bee968384d2e39e2d8af0fcf6fd46",
+    "local_image": "velo.png",
+    "alchemy_metadata": {
+      "name": "VELO",
+      "symbol": "VELO",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "paal-ai",
+    "symbol": "paal",
+    "name": "PAAL AI",
+    "contract_address": "0xbb1b031c591235408755ff4e0739cb88c5cf2507",
+    "local_image": "paal-ai.png",
+    "alchemy_metadata": {
+      "name": "PAAL AI",
+      "symbol": "$PAAL",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "venus",
+    "symbol": "xvs",
+    "name": "Venus",
+    "contract_address": "0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63",
+    "local_image": "venus.png",
+    "alchemy_metadata": {
+      "name": "Venus",
+      "symbol": "XVS",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "space-id",
+    "symbol": "id",
+    "name": "SPACE ID",
+    "contract_address": "0x2dff88a56767223a5529ea5960da7a3f5f766406",
+    "local_image": "space-id.png",
+    "alchemy_metadata": {
+      "name": "SPACE ID",
+      "symbol": "ID",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "non-playable-coin",
+    "symbol": "npc",
+    "name": "Non-Playable Coin",
+    "contract_address": "0xfebfa339e44c28e2aa9e62ea1027c9cb4e378605",
+    "local_image": "non-playable-coin.png",
+    "alchemy_metadata": {
+      "name": "Non-Playable Coin",
+      "symbol": "NPC",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "global-commercial-business",
+    "symbol": "gcb",
+    "name": "Global Commercial Business",
+    "contract_address": "0x84f70be4deb029d5f8aacbeacc74c4dc10737342",
+    "local_image": "global-commercial-business.png",
+    "alchemy_metadata": {
+      "name": "GCB",
+      "symbol": "GCB",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "orbs",
+    "symbol": "orbs",
+    "name": "Orbs",
+    "contract_address": "0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+    "local_image": "orbs.png",
+    "alchemy_metadata": {
+      "name": "Orbs",
+      "symbol": "ORBS",
+      "decimals": 18
+    }
+  },
+  {
+    "extract_time": 1743243120.514049,
+    "id": "everipedia",
+    "symbol": "iq",
+    "name": "IQ",
+    "contract_address": "0x0e37d70b51ffa2b98b4d34a5712c5291115464e3",
+    "local_image": "everipedia.png",
+    "alchemy_metadata": {
+      "name": "Everipedia IQ",
+      "symbol": "IQ",
       "decimals": 18
     }
   }
