@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { SelectChainButton } from "@/components/ui/SelectChainButton";
-import { Chain } from "@/config/chains";
+import { Chain } from "@/types/web3";
 
 interface AssetBoxProps {
   title: string;

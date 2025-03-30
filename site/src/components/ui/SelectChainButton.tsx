@@ -7,7 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import { Chain, chainList, defaultSourceChain } from "@/config/chains";
+import { chainList, defaultSourceChain } from "@/config/chains";
+import { Chain } from "@/types/web3";
 import useWeb3Store from "@/store/web3Store";
 
 interface SelectChainButtonProps {
@@ -221,9 +222,9 @@ export const SelectChainButton: React.FC<SelectChainButtonProps> = ({
                 {/* L2 indicator icon with text */}
                 {chain.l2 && (
                   <div className="relative mr-1 flex-shrink-0">
-                    <CornerDownRight className="text-gray-500" size={16} />
+                    <CornerDownRight className="text-zinc-500" size={16} />
                     <span
-                      className="absolute text-[7px] font-bold text-gray-600"
+                      className="absolute text-[7px] font-bold text-zinc-600"
                       style={{
                         left: "6px",
                         top: "2px",

@@ -1,16 +1,18 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { WalletInfo, Web3StoreState, WalletType } from "@/types/web3";
 import {
+  WalletInfo,
+  Web3StoreState,
+  WalletType,
+  Token,
   Chain,
-  defaultSourceChain,
-  defaultDestinationChain,
-} from "@/config/chains";
+} from "@/types/web3";
+import { defaultSourceChain, defaultDestinationChain } from "@/config/chains";
+import { loadAllTokens, StructuredTokenData } from "@/utils/tokenMethods";
 
-// Create the store with standard persist middleware
 const useWeb3Store = create<Web3StoreState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       connectedWallets: [],
       activeWallet: null,
 
@@ -18,9 +20,16 @@ const useWeb3Store = create<Web3StoreState>()(
       sourceChain: defaultSourceChain,
       destinationChain: defaultDestinationChain,
 
+      // tokens
+      tokensByCompositeKey: {},
+      tokensByChainId: {},
+      tokensByAddress: {},
+      allTokensList: [],
+      tokensLoading: false,
+      tokensError: null,
+
       // Wallet actions
       addWallet: (wallet: WalletInfo) => {
-        // Create a new wallet object without the provider
         const walletForStorage = {
           type: wallet.type,
           name: wallet.name,
@@ -104,7 +113,6 @@ const useWeb3Store = create<Web3StoreState>()(
       setSourceChain: (chain: Chain) => {
         set((state) => ({
           sourceChain: chain,
-          // Optionally prevent same source and destination
           destinationChain:
             state.destinationChain.id === chain.id
               ? state.sourceChain
@@ -115,7 +123,6 @@ const useWeb3Store = create<Web3StoreState>()(
       setDestinationChain: (chain: Chain) => {
         set((state) => ({
           destinationChain: chain,
-          // Optionally prevent same source and destination
           sourceChain:
             state.sourceChain.id === chain.id
               ? state.destinationChain
@@ -129,11 +136,71 @@ const useWeb3Store = create<Web3StoreState>()(
           destinationChain: state.sourceChain,
         }));
       },
+
+      loadTokens: async () => {
+        if (get().tokensLoading) return;
+
+        try {
+          set({ tokensLoading: true, tokensError: null });
+          const structuredTokens: StructuredTokenData = await loadAllTokens();
+          set({
+            tokensByCompositeKey: structuredTokens.byCompositeKey,
+            tokensByChainId: structuredTokens.byChainId,
+            tokensByAddress: structuredTokens.byChainIdAndAddress,
+            allTokensList: structuredTokens.allTokensList,
+            tokensLoading: false,
+            tokensError: null,
+          });
+        } catch (error) {
+          console.error("Error loading tokens:", error);
+          set({
+            tokensByCompositeKey: {}, // Reset on error
+            tokensByChainId: {},
+            tokensByAddress: {},
+            allTokensList: [],
+            tokensError: error instanceof Error ? error.message : String(error),
+            tokensLoading: false,
+          });
+        }
+      },
+
+      getWalletTokens: (): Token[] => {
+        return get().allTokensList.filter((token) => token.isWalletToken);
+      },
+
+      getAllTokens: (): Token[] => {
+        return get().allTokensList.filter((token) => !token.isWalletToken);
+      },
+
+      getTokensForChain: (chainId: number): Token[] => {
+        return get().tokensByChainId[chainId] || [];
+      },
+
+      getTokenById: (compositeKey: string): Token | undefined => {
+        return get().tokensByCompositeKey[compositeKey];
+      },
+
+      getTokenByAddress: (
+        address: string,
+        chainId: number,
+      ): Token | undefined => {
+        const lowerAddress = address.toLowerCase();
+        const chainTokensByAddress = get().tokensByAddress[chainId];
+        return chainTokensByAddress
+          ? chainTokensByAddress[lowerAddress]
+          : undefined;
+      },
+
+      findTokenByAddressAnyChain: (address: string): Token | undefined => {
+        const lowerAddress = address.toLowerCase();
+        return get().allTokensList.find(
+          (token) => token.address.toLowerCase() === lowerAddress,
+        );
+      },
     }),
     {
       name: "altverse-storage-web3",
       storage: createJSONStorage(() => {
-        // Handle SSR case
         if (typeof window === "undefined") {
           return {
             getItem: () => Promise.resolve(null),
@@ -161,12 +228,12 @@ const useWeb3Store = create<Web3StoreState>()(
           : null,
         sourceChain: state.sourceChain,
         destinationChain: state.destinationChain,
+        // We don't need to persist tokens since they're loaded from the JSON files
       }),
     },
   ),
 );
 
-// Utility hooks for chain selection
 export const useCurrentChainId = (): number | null => {
   return useWeb3Store((state) => state.activeWallet?.chainId ?? null);
 };
@@ -177,6 +244,52 @@ export const useSourceChain = (): Chain => {
 
 export const useDestinationChain = (): Chain => {
   return useWeb3Store((state) => state.destinationChain);
+};
+
+export const useTokensLoading = (): boolean => {
+  return useWeb3Store((state) => state.tokensLoading);
+};
+
+export const useTokensError = (): string | null => {
+  return useWeb3Store((state) => state.tokensError);
+};
+
+export const useAllTokensList = (): Token[] => {
+  return useWeb3Store((state) => state.allTokensList);
+};
+
+export const useTokensForChain = (chainId: number): Token[] => {
+  return useWeb3Store((state) => state.tokensByChainId[chainId] || []);
+};
+
+export const useSourceChainTokens = (): Token[] => {
+  const sourceChainId = useWeb3Store((state) => state.sourceChain.chainId);
+  return useWeb3Store((state) => state.tokensByChainId[sourceChainId] || []);
+};
+
+export const useDestinationChainTokens = (): Token[] => {
+  const destinationChainId = useWeb3Store(
+    (state) => state.destinationChain.chainId,
+  );
+  return useWeb3Store(
+    (state) => state.tokensByChainId[destinationChainId] || [],
+  );
+};
+
+export const useTokenByAddress = (
+  address: string | undefined,
+  chainId: number | undefined,
+): Token | undefined => {
+  const lowerAddress = address?.toLowerCase();
+  return useWeb3Store((state) => {
+    if (!lowerAddress || chainId === undefined) return undefined;
+    const chainTokens = state.tokensByAddress[chainId];
+    return chainTokens ? chainTokens[lowerAddress] : undefined;
+  });
+};
+
+export const useLoadTokens = () => {
+  return useWeb3Store((state) => state.loadTokens);
 };
 
 export default useWeb3Store;

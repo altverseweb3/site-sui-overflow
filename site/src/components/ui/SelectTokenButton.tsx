@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import Image from "next/image";
-import { Search, X, Copy, Check } from "lucide-react";
+import { Search, X, Copy, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
   Dialog,
@@ -11,106 +17,108 @@ import {
   StyledDialogClose,
   DialogTitle,
 } from "@/components/ui/StyledDialog";
-import { Token, getWalletTokens, getAllTokens } from "@/config/tokens";
-import useWeb3Store from "@/store/web3Store";
+import { Token, Chain } from "@/types/web3";
+import useWeb3Store, {
+  useTokensLoading,
+  useSourceChain,
+  useDestinationChain,
+} from "@/store/web3Store";
+import { TokenImage } from "./TokenImage";
+import { useDebounce } from "use-debounce";
+import { SkeletonTokenList } from "./SkeletonTokenList";
 
-// Define interfaces for our component props
 interface TokenListItemProps {
   token: Token;
   onSelect: (token: Token) => void;
   copiedAddresses: Record<string, boolean>;
   onCopy: (text: string, tokenId: string) => void;
+  chain: Chain;
 }
 
-// Token list item component to eliminate duplication
-const TokenListItem: React.FC<TokenListItemProps> = ({
-  token,
-  onSelect,
-  copiedAddresses,
-  onCopy,
-}) => {
-  // Format address to show first 6 and last 4 characters
-  const formatAddress = (address: string) => {
-    if (!address) return "";
-    if (address.length <= 8) return address;
-    return `${address.substring(0, 6)}...${address.substring(
-      address.length - 4,
-    )}`;
-  };
+const TokenListItem: React.FC<TokenListItemProps> = React.memo(
+  ({ token, onSelect, copiedAddresses, onCopy, chain }) => {
+    const formatAddress = (address: string) => {
+      if (!address) return "";
+      if (address.length <= 8) return address;
+      return `${address.substring(0, 6)}...${address.substring(
+        address.length - 4,
+      )}`;
+    };
 
-  return (
-    <div
-      className="px-2 py-0.5 cursor-pointer group"
-      onClick={() => onSelect(token)}
-    >
-      <div className="flex items-center justify-between p-[5px] px-[9px] rounded-md w-full transition-colors duration-150 ease-in-out hover:bg-[#27272A]">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 relative flex-shrink-0">
-            <Image
-              src={`/tokens/branded/${token.icon}`}
-              alt={token.name}
-              fill
-              className="object-contain"
-            />
-          </div>
-          <div className="flex flex-col">
-            <div className="font-medium text-[#FAFAFA]">{token.name}</div>
-            <div className="flex items-center text-[0.75rem] text-[#FAFAFA55]">
-              <span className="numeric-input flex items-center w-16">
-                {token.ticker}
-              </span>
-              <div className="flex items-center">
-                <span
-                  className="numeric-input text-[10px] flex items-center"
-                  style={{ transform: "translateY(1px)" }}
-                >
-                  {formatAddress(token.address)}
+    const handleClick = useCallback(() => {
+      onSelect(token);
+    }, [onSelect, token]);
+
+    const handleCopy = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onCopy(token.address, token.id);
+      },
+      [onCopy, token.address, token.id],
+    );
+
+    return (
+      <div className="px-2 py-0.5 cursor-pointer group" onClick={handleClick}>
+        <div className="flex items-center justify-between p-[5px] px-[9px] rounded-md w-full transition-colors duration-150 ease-in-out hover:bg-[#27272A]">
+          <div className="flex items-center gap-3">
+            <TokenImage token={token} chain={chain} />
+
+            <div className="flex flex-col">
+              <div className="font-medium text-[#FAFAFA]">{token.name}</div>
+              <div className="flex items-center text-[0.75rem] text-[#FAFAFA55]">
+                <span className="numeric-input flex items-center w-16">
+                  {token.ticker}
                 </span>
-                <button
-                  className="ml-1 text-[#FAFAFA40] hover:text-[#FAFAFA80] focus:outline-none transition-colors opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCopy(token.address, token.id);
-                  }}
-                  title="Copy address"
-                  aria-label="Copy address to clipboard"
-                >
-                  <div className="relative h-3 w-3">
-                    {/* Copy icon with fade-out animation when copied */}
-                    <Copy
-                      className={`h-3 w-3 absolute transition-all duration-300 ${
-                        copiedAddresses[token.id]
-                          ? "opacity-0 scale-75 transform rotate-[-8deg]"
-                          : "opacity-100"
-                      }`}
-                    />
+                <div className="flex items-center">
+                  <span
+                    className="numeric-input text-[10px] flex items-center"
+                    style={{ transform: "translateY(1px)" }}
+                  >
+                    {formatAddress(token.address)}
+                  </span>
+                  <button
+                    className="ml-1 text-[#FAFAFA40] hover:text-[#FAFAFA80] focus:outline-none transition-colors opacity-0 group-hover:opacity-100"
+                    onClick={handleCopy}
+                    title="Copy address"
+                    aria-label="Copy address to clipboard"
+                  >
+                    <div className="relative h-3 w-3">
+                      <Copy
+                        className={`h-3 w-3 absolute transition-all duration-300 ${
+                          copiedAddresses[token.id]
+                            ? "opacity-0 scale-75 transform rotate-[-8deg]"
+                            : "opacity-100"
+                        }`}
+                      />
 
-                    {/* Check icon with fade-in animation when copied */}
-                    <Check
-                      className={`h-3 w-3 absolute text-amber-500 transition-all duration-300 ${
-                        copiedAddresses[token.id]
-                          ? "opacity-100 scale-100"
-                          : "opacity-0 scale-50 transform rotate-[15deg]"
-                      }`}
-                    />
-                  </div>
-                </button>
+                      <Check
+                        className={`h-3 w-3 absolute text-amber-500 transition-all duration-300 ${
+                          copiedAddresses[token.id]
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-50 transform rotate-[15deg]"
+                        }`}
+                      />
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="text-right">
-          <div className="font-medium text-[#FAFAFA] numeric-input">
-            {token.userBalanceUsd}
-          </div>
-          <div className="text-sm text-[#FAFAFA55] numeric-input">
-            {token.userBalance}
+          <div className="text-right">
+            <div className="font-medium text-[#FAFAFA] numeric-input">
+              {token.userBalanceUsd}
+            </div>
+            <div className="text-sm text-[#FAFAFA55] numeric-input">
+              {token.userBalance}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+TokenListItem.displayName = "TokenListItem";
 
 interface TokenListSectionProps {
   title: string;
@@ -118,35 +126,114 @@ interface TokenListSectionProps {
   onSelectToken: (token: Token) => void;
   copiedAddresses: Record<string, boolean>;
   onCopy: (text: string, tokenId: string) => void;
+  chain: Chain;
 }
 
-// Token list section component
-const TokenListSection: React.FC<TokenListSectionProps> = ({
-  title,
-  tokens,
-  onSelectToken,
-  copiedAddresses,
-  onCopy,
-}) => {
-  if (tokens.length === 0) return null;
+const TokenListSection: React.FC<TokenListSectionProps> = React.memo(
+  ({ title, tokens, onSelectToken, copiedAddresses, onCopy, chain }) => {
+    if (tokens.length === 0) return null;
 
-  return (
-    <div>
-      <div className="px-4 pb-2 pt-4 text-sm text-[#FAFAFA55]">{title}</div>
+    return (
       <div>
-        {tokens.map((token) => (
-          <TokenListItem
-            key={token.id}
-            token={token}
-            onSelect={onSelectToken}
-            copiedAddresses={copiedAddresses}
-            onCopy={onCopy}
-          />
-        ))}
+        <div className="px-4 pb-2 pt-4 text-sm text-[#FAFAFA55]">{title}</div>
+        <div>
+          {tokens.map((token) => (
+            <TokenListItem
+              key={`${token.id}-${token.chainId}-${token.address}`}
+              token={token}
+              onSelect={onSelectToken}
+              copiedAddresses={copiedAddresses}
+              onCopy={onCopy}
+              chain={chain}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+TokenListSection.displayName = "TokenListSection";
+
+const VirtualizedTokenList: React.FC<{
+  walletTokens: Token[];
+  allTokens: Token[];
+  onSelectToken: (token: Token) => void;
+  copiedAddresses: Record<string, boolean>;
+  onCopy: (text: string, tokenId: string) => void;
+  chain: Chain;
+  searchQuery: string;
+}> = React.memo(
+  ({
+    walletTokens,
+    allTokens,
+    onSelectToken,
+    copiedAddresses,
+    onCopy,
+    chain,
+    searchQuery,
+  }) => {
+    const filteredWalletTokens = useMemo(() => {
+      const query = searchQuery.toLowerCase();
+      if (!query) return walletTokens;
+
+      return walletTokens.filter(
+        (token) =>
+          token.name.toLowerCase().includes(query) ||
+          token.ticker.toLowerCase().includes(query) ||
+          token.address.toLowerCase().includes(query),
+      );
+    }, [walletTokens, searchQuery]);
+
+    const filteredAllTokens = useMemo(() => {
+      const query = searchQuery.toLowerCase();
+      if (!query) return allTokens;
+
+      return allTokens.filter(
+        (token) =>
+          token.name.toLowerCase().includes(query) ||
+          token.ticker.toLowerCase().includes(query) ||
+          token.address.toLowerCase().includes(query),
+      );
+    }, [allTokens, searchQuery]);
+
+    if (filteredWalletTokens.length === 0 && filteredAllTokens.length === 0) {
+      return (
+        <div className="p-4 text-center text-[#FAFAFA55]">
+          {searchQuery
+            ? `No tokens found matching "${searchQuery}"`
+            : `No tokens available for ${chain.name}`}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {/* Wallet tokens section */}
+        <TokenListSection
+          title="your wallet"
+          tokens={filteredWalletTokens}
+          onSelectToken={onSelectToken}
+          copiedAddresses={copiedAddresses}
+          onCopy={onCopy}
+          chain={chain}
+        />
+
+        {/* All tokens section */}
+        <TokenListSection
+          title="all tokens"
+          tokens={filteredAllTokens}
+          onSelectToken={onSelectToken}
+          copiedAddresses={copiedAddresses}
+          onCopy={onCopy}
+          chain={chain}
+        />
+      </>
+    );
+  },
+);
+
+VirtualizedTokenList.displayName = "VirtualizedTokenList";
 
 interface SelectTokenButtonProps {
   variant: "send" | "receive";
@@ -157,54 +244,133 @@ interface SelectTokenButtonProps {
 export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
   variant,
   onTokenSelect,
+  selectedToken,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const walletTokens = getWalletTokens();
-  const allTokens = getAllTokens();
-  const sourceChain = useWeb3Store((state) => state.sourceChain);
-  const destinationChain = useWeb3Store((state) => state.destinationChain);
-  const chainToShow = variant === "send" ? sourceChain : destinationChain;
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 150);
   const [copiedAddresses, setCopiedAddresses] = useState<
     Record<string, boolean>
   >({});
+  const [isTokenListReady, setTokenListReady] = useState(false);
+  const tokensPreloadedRef = useRef(false);
+  const [userIntentToOpen, setUserIntentToOpen] = useState(false);
 
-  const copyToClipboard = (text: string, tokenId: string) => {
+  const tokensLoading = useTokensLoading();
+  const sourceChain = useSourceChain();
+  const destinationChain = useDestinationChain();
+  const chainToShow = variant === "send" ? sourceChain : destinationChain;
+
+  const loadTokens = useWeb3Store((state) => state.loadTokens);
+  const getTokensForChain = useWeb3Store((state) => state.getTokensForChain);
+  const tokenCount = useWeb3Store((state) => state.allTokensList.length);
+
+  useEffect(() => {
+    if (tokenCount === 0 && !tokensLoading && !tokensPreloadedRef.current) {
+      tokensPreloadedRef.current = true;
+      loadTokens();
+    }
+  }, [loadTokens, tokensLoading, tokenCount]);
+
+  useEffect(() => {
+    if (userIntentToOpen && tokenCount === 0 && !tokensLoading) {
+      loadTokens();
+    }
+  }, [userIntentToOpen, loadTokens, tokensLoading, tokenCount]);
+
+  useEffect(() => {
+    let timerId: NodeJS.Timeout | undefined;
+
+    if (!isOpen) {
+      timerId = setTimeout(() => {
+        setTokenListReady(false);
+      }, 200);
+    }
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && !isTokenListReady) {
+      requestAnimationFrame(() => {
+        const timer = setTimeout(() => {
+          setTokenListReady(true);
+        }, 100);
+        return () => clearTimeout(timer);
+      });
+    }
+  }, [isOpen, isTokenListReady]);
+
+  const chainTokens = useMemo(() => {
+    if (tokensLoading || !chainToShow) return [];
+    return getTokensForChain(chainToShow.chainId);
+  }, [getTokensForChain, chainToShow, tokensLoading]);
+
+  const walletTokens = useMemo(() => {
+    return chainTokens.filter((token) => token.isWalletToken);
+  }, [chainTokens]);
+
+  const allTokens = useMemo(() => {
+    return chainTokens.filter((token) => !token.isWalletToken);
+  }, [chainTokens]);
+
+  const copyToClipboard = useCallback((text: string, tokenId: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      // Set this specific token's address as copied
       setCopiedAddresses((prev) => ({ ...prev, [tokenId]: true }));
 
-      // Reset the copied state after 2 seconds (giving enough time for the animation)
       setTimeout(() => {
         setCopiedAddresses((prev) => ({ ...prev, [tokenId]: false }));
       }, 2000);
     });
-  };
+  }, []);
 
-  // Filter tokens based on search query
-  const filteredWalletTokens = walletTokens.filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.address.toLowerCase().includes(searchQuery.toLowerCase()),
+  const handleSelectToken = useCallback(
+    (token: Token) => {
+      if (onTokenSelect) {
+        onTokenSelect(token);
+      }
+      setIsOpen(false);
+    },
+    [onTokenSelect],
   );
 
-  const filteredAllTokens = allTokens.filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.address.toLowerCase().includes(searchQuery.toLowerCase()),
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    [],
   );
 
-  // Handle token selection
-  const handleSelectToken = (token: Token) => {
-    if (onTokenSelect) {
-      onTokenSelect(token);
+  const handleOpenChange = useCallback((open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      setSearchQuery("");
     }
-    setIsOpen(false);
-  };
+  }, []);
 
-  // More consistent base classes with better mobile sizing
+  const handleMouseEnter = useCallback(() => {
+    setUserIntentToOpen(true);
+  }, []);
+
+  const buttonContent = useMemo(() => {
+    if (!selectedToken) {
+      return <span className="truncate">select token</span>;
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-5 h-5 relative">
+          <TokenImage token={selectedToken} chain={chainToShow} size="sm" />
+        </div>
+        <span className="truncate">{selectedToken.ticker}</span>
+      </div>
+    );
+  }, [selectedToken, chainToShow]);
+
+  // Base classes
   const baseClasses =
     "min-w-[100px] sm:min-w-[110px] md:min-w-[120px] flex items-center justify-between gap-2 px-2 py-2 sm:py-2 rounded-[6px] text-[1rem] font-medium whitespace-nowrap";
 
@@ -215,13 +381,14 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           type="button"
           className={`${baseClasses} ${variantClasses[variant]} h-[2rem] sm:h-[2.25rem]`}
+          onMouseEnter={handleMouseEnter}
         >
-          <span className="truncate">select token</span>
+          {buttonContent}
           <svg
             width="20"
             height="20"
@@ -264,7 +431,7 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
               type="text"
               placeholder="search token or paste address"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full h-[38px] bg-[#27272A] text-[#FAFAFA] placeholder-[#FAFAFA20] pl-10 pr-10 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 sm:text-lg text-base"
               style={{ fontSize: "16px" }}
             />
@@ -284,32 +451,33 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
           </div>
         </div>
 
-        {/* Apply our custom scrollbar class */}
+        {/* Content area */}
         <div className="max-h-[420px] overflow-y-auto scrollbar-thin px-2">
-          {/* Token list sections using our new component */}
-          <TokenListSection
-            title="your wallet"
-            tokens={filteredWalletTokens}
-            onSelectToken={handleSelectToken}
-            copiedAddresses={copiedAddresses}
-            onCopy={copyToClipboard}
-          />
+          {/* Loading state */}
+          {tokensLoading && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+              <span className="mt-2 text-[#FAFAFA80]">Loading tokens...</span>
+            </div>
+          )}
 
-          <TokenListSection
-            title="all tokens"
-            tokens={filteredAllTokens}
-            onSelectToken={handleSelectToken}
-            copiedAddresses={copiedAddresses}
-            onCopy={copyToClipboard}
-          />
+          {/* Skeleton while the actual tokens are being prepared */}
+          {!tokensLoading && !isTokenListReady && (
+            <SkeletonTokenList itemCount={8} />
+          )}
 
-          {/* No results */}
-          {filteredWalletTokens.length === 0 &&
-            filteredAllTokens.length === 0 && (
-              <div className="p-4 text-center text-[#FAFAFA55]">
-                No tokens found matching &quot;{searchQuery}&quot;
-              </div>
-            )}
+          {/* Actual token list - only shown when ready */}
+          {!tokensLoading && isTokenListReady && (
+            <VirtualizedTokenList
+              walletTokens={walletTokens}
+              allTokens={allTokens}
+              onSelectToken={handleSelectToken}
+              copiedAddresses={copiedAddresses}
+              onCopy={copyToClipboard}
+              chain={chainToShow}
+              searchQuery={debouncedSearchQuery}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

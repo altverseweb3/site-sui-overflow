@@ -1,21 +1,6 @@
 // src/config/chains.ts
+import { Chain } from "@/types/web3";
 
-export type Chain = {
-  id: string;
-  name: string;
-  symbol: string;
-  icon: string;
-  backgroundColor: string;
-  fontColor: string;
-  rpcUrl?: string;
-  explorerUrl?: string;
-  chainId?: number;
-  decimals?: number;
-  testnet?: boolean;
-  l2: boolean;
-};
-
-// Default chains configuration
 export const chains: Record<string, Chain> = {
   ethereum: {
     id: "ethereum",
@@ -63,24 +48,37 @@ export const chains: Record<string, Chain> = {
     icon: "BASE.svg",
     backgroundColor: "#0D5BFF",
     fontColor: "#FFFFFF",
-    rpcUrl: "https://mainnet.optimism.io",
-    explorerUrl: "https://optimistic.etherscan.io",
-    chainId: 10,
+    rpcUrl: "https://mainnet.base.org",
+    explorerUrl: "https://basescan.org",
+    chainId: 8453,
     decimals: 18,
     l2: true,
   },
-  linea: {
-    id: "linea",
-    name: "linea",
-    symbol: "LINEA",
-    icon: "LINEA.svg",
-    backgroundColor: "#FFF068",
-    fontColor: "#000000",
-    rpcUrl: "https://mainnet.optimism.io",
-    explorerUrl: "https://optimistic.etherscan.io",
-    chainId: 10,
+  unichain: {
+    id: "unichain",
+    name: "unichain",
+    symbol: "UNI",
+    icon: "UNI.svg",
+    backgroundColor: "#F50DB4",
+    fontColor: "#FFFFFF",
+    rpcUrl: "https://unichain-rpc.publicnode.com",
+    explorerUrl: "https://uniscan.xyz",
+    chainId: 130,
     decimals: 18,
     l2: true,
+  },
+  sui: {
+    id: "sui",
+    name: "sui",
+    symbol: "SUI",
+    icon: "SUI.svg",
+    backgroundColor: "#4BA2FF",
+    fontColor: "#FAFAFA",
+    rpcUrl: "https://sui-mainnet-endpoint.blockvision.org",
+    explorerUrl: "https://suiscan.xyz/mainnet/home",
+    chainId: 999,
+    decimals: 9,
+    l2: false,
   },
   polygon: {
     id: "polygon",
@@ -95,8 +93,8 @@ export const chains: Record<string, Chain> = {
     decimals: 18,
     l2: false,
   },
-  binance: {
-    id: "binance",
+  "binance-smart-chain": {
+    id: "binance-smart-chain",
     name: "bnb chain",
     symbol: "BNB",
     icon: "BNB.svg",
@@ -121,46 +119,40 @@ export const chains: Record<string, Chain> = {
     decimals: 18,
     l2: false,
   },
-  sonic: {
-    id: "sonic",
-    name: "sonic",
-    symbol: "S",
-    icon: "S.svg",
-    backgroundColor: "#131315",
+  solana: {
+    id: "solana",
+    name: "solana",
+    symbol: "SOL",
+    icon: "SOL.svg",
+    backgroundColor: "#9945FF",
     fontColor: "#FFFFFF",
-    rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
-    explorerUrl: "https://snowtrace.io",
-    chainId: 43114,
-    decimals: 18,
+    rpcUrl: "https://api.mainnet-beta.solana.com",
+    explorerUrl: "https://explorer.solana.com/",
+    chainId: 101,
+    decimals: 9,
     l2: false,
   },
 };
 
-// List of chains in array format (useful for mapping)
 export const chainList: Chain[] = Object.values(chains);
 
-// Default chain
 export const defaultSourceChain: Chain = chains.ethereum;
-export const defaultDestinationChain: Chain = chains.polygon;
+export const defaultDestinationChain: Chain = chains.unichain;
 
-// Get chain by ID
 export const getChainById = (id: string): Chain => {
   return chains[id] || defaultSourceChain;
 };
 
-// Get chain by chain ID (numeric)
 export const getChainByChainId = (chainId: number): Chain => {
   return (
     chainList.find((chain) => chain.chainId === chainId) || defaultSourceChain
   );
 };
 
-// Get testnet chains
 export const getTestnetChains = (): Chain[] => {
   return chainList.filter((chain) => chain.testnet);
 };
 
-// Get mainnet chains
 export const getMainnetChains = (): Chain[] => {
   return chainList.filter((chain) => !chain.testnet);
 };

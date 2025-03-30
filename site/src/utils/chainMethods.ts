@@ -1,4 +1,5 @@
-import { Chain, chains } from "@/config/chains";
+import { chains } from "@/config/chains";
+import { Chain } from "@/types/web3";
 import useWeb3Store from "@/store/web3Store";
 
 /**
