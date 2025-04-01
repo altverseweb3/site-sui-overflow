@@ -239,6 +239,7 @@ VirtualizedTokenList.displayName = "VirtualizedTokenList";
 
 interface SelectTokenButtonProps {
   variant: "source" | "destination";
+  onTokenSelect?: (token: Token) => void;
   selectedToken?: Token;
 }
 
@@ -338,10 +339,8 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
   const handleSelectToken = useCallback(
     (token: Token) => {
       if (variant === "source") {
-        console.log("Setting source token:", token.name);
         setSourceToken(token);
       } else {
-        console.log("Setting destination token:", token.name);
         setDestinationToken(token);
       }
 
@@ -374,18 +373,24 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
     }
 
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-5 h-5 relative">
+      <div className="flex items-center gap-2 flex-1 mr-1">
+        <div className="w-5 h-5 relative flex-shrink-0">
           <TokenImage token={selectedToken} chain={chainToShow} size="sm" />
         </div>
-        <span className="truncate">{selectedToken.ticker}</span>
+        <div className="flex flex-col items-start justify-center leading-none min-w-0 w-full">
+          <span className="truncate text-[#FAFAFA] text-[16px] w-full text-left">
+            {selectedToken.ticker}
+          </span>
+          <span className="text-[9px] text-[#FAFAFA98] mt-[2px] w-full text-left">
+            {chainToShow.name}
+          </span>
+        </div>
       </div>
     );
   }, [selectedToken, chainToShow]);
 
-  // Base classes
   const baseClasses =
-    "min-w-[100px] sm:min-w-[110px] md:min-w-[120px] flex items-center justify-between gap-2 px-2 py-2 sm:py-2 rounded-[6px] text-[1rem] font-medium whitespace-nowrap";
+    "min-w-[100px] sm:min-w-[110px] md:min-w-[120px] flex items-center justify-between gap-2 px-2 rounded-[6px] text-[1rem] font-medium whitespace-nowrap h-[2rem] sm:h-[2.25rem]";
 
   const variantClasses: Record<SelectTokenButtonProps["variant"], string> = {
     source:
@@ -394,12 +399,19 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
       "bg-[#0EA5E9]/10 text-sky-500 hover:bg-[#0b466b] hover:text-sky-400 border-[#0EA5E9]/25 border-[1px] text-sm sm:text-base",
   };
 
+  const selectedTokenClass =
+    "bg-[#27272A] text-[#FAFAFA] hover:bg-[#323232] border-0 text-sm sm:text-base";
+
+  const buttonClass = selectedToken
+    ? `${baseClasses} ${selectedTokenClass}`
+    : `${baseClasses} ${variantClasses[variant]}`;
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           type="button"
-          className={`${baseClasses} ${variantClasses[variant]} h-[2rem] sm:h-[2.25rem]`}
+          className={`${buttonClass} ${selectedToken ? "py-[3px]" : "py-2"}`}
           onMouseEnter={handleMouseEnter}
         >
           {buttonContent}
@@ -413,7 +425,7 @@ export const SelectTokenButton: React.FC<SelectTokenButtonProps> = ({
           >
             <path
               d="M5 7.5L10 12.5L15 7.5"
-              stroke="currentColor"
+              stroke={selectedToken ? "#A1A1A1" : "currentColor"}
               strokeWidth="1.66667"
               strokeLinecap="round"
               strokeLinejoin="round"
