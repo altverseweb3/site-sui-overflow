@@ -20,6 +20,10 @@ const useWeb3Store = create<Web3StoreState>()(
       sourceChain: defaultSourceChain,
       destinationChain: defaultDestinationChain,
 
+      // Token selection state
+      sourceToken: null,
+      destinationToken: null,
+
       // tokens
       tokensByCompositeKey: {},
       tokensByChainId: {},
@@ -117,6 +121,8 @@ const useWeb3Store = create<Web3StoreState>()(
             state.destinationChain.id === chain.id
               ? state.sourceChain
               : state.destinationChain,
+          // Reset source token when changing chains
+          sourceToken: null,
         }));
       },
 
@@ -127,6 +133,8 @@ const useWeb3Store = create<Web3StoreState>()(
             state.sourceChain.id === chain.id
               ? state.destinationChain
               : state.sourceChain,
+          // Reset destination token when changing chains
+          destinationToken: null,
         }));
       },
 
@@ -134,6 +142,34 @@ const useWeb3Store = create<Web3StoreState>()(
         set((state) => ({
           sourceChain: state.destinationChain,
           destinationChain: state.sourceChain,
+          // Swap tokens along with chains
+          sourceToken: state.destinationToken,
+          destinationToken: state.sourceToken,
+        }));
+      },
+
+      // Token selection actions
+      setSourceToken: (token: Token | null) => {
+        console.log("Setting source token:", token ? token.name : "null");
+        set({ sourceToken: token });
+      },
+
+      setDestinationToken: (token: Token | null) => {
+        console.log("Setting destination token:", token ? token.name : "null");
+        set({ destinationToken: token });
+      },
+
+      swapTokens: () => {
+        const state = get();
+        console.log(
+          "Swapping tokens:",
+          state.sourceToken ? state.sourceToken.name : "null",
+          "<->",
+          state.destinationToken ? state.destinationToken.name : "null",
+        );
+        set((state) => ({
+          sourceToken: state.destinationToken,
+          destinationToken: state.sourceToken,
         }));
       },
 
@@ -143,11 +179,43 @@ const useWeb3Store = create<Web3StoreState>()(
         try {
           set({ tokensLoading: true, tokensError: null });
           const structuredTokens: StructuredTokenData = await loadAllTokens();
+
+          // Get current serialized tokens
+          const currentSourceToken = get().sourceToken;
+          const currentDestinationToken = get().destinationToken;
+
+          // Find the full token objects from the loaded tokens if they exist
+          let fullSourceToken = null;
+          let fullDestinationToken = null;
+
+          if (currentSourceToken) {
+            fullSourceToken =
+              structuredTokens.allTokensList.find(
+                (token) =>
+                  token.address.toLowerCase() ===
+                    currentSourceToken.address.toLowerCase() &&
+                  token.chainId === currentSourceToken.chainId,
+              ) || null;
+          }
+
+          if (currentDestinationToken) {
+            fullDestinationToken =
+              structuredTokens.allTokensList.find(
+                (token) =>
+                  token.address.toLowerCase() ===
+                    currentDestinationToken.address.toLowerCase() &&
+                  token.chainId === currentDestinationToken.chainId,
+              ) || null;
+          }
+
           set({
             tokensByCompositeKey: structuredTokens.byCompositeKey,
             tokensByChainId: structuredTokens.byChainId,
             tokensByAddress: structuredTokens.byChainIdAndAddress,
             allTokensList: structuredTokens.allTokensList,
+            // Rehydrate full token objects from the loaded token list
+            sourceToken: fullSourceToken,
+            destinationToken: fullDestinationToken,
             tokensLoading: false,
             tokensError: null,
           });
@@ -210,26 +278,48 @@ const useWeb3Store = create<Web3StoreState>()(
         }
         return localStorage;
       }),
-      partialize: (state) => ({
-        // Only persist what we need and ensure we don't store providers
-        connectedWallets: state.connectedWallets.map((wallet) => ({
-          type: wallet.type,
-          name: wallet.name,
-          address: wallet.address,
-          chainId: wallet.chainId,
-        })),
-        activeWallet: state.activeWallet
-          ? {
-              type: state.activeWallet.type,
-              name: state.activeWallet.name,
-              address: state.activeWallet.address,
-              chainId: state.activeWallet.chainId,
-            }
-          : null,
-        sourceChain: state.sourceChain,
-        destinationChain: state.destinationChain,
-        // We don't need to persist tokens since they're loaded from the JSON files
-      }),
+      partialize: (state) => {
+        // Create serializable versions of the tokens to store
+        const serializeToken = (token: Token | null) => {
+          if (!token) return null;
+          return {
+            id: token.id,
+            name: token.name,
+            ticker: token.ticker,
+            icon: token.icon,
+            address: token.address,
+            decimals: token.decimals,
+            chainId: token.chainId,
+            userBalance: token.userBalance,
+            userBalanceUsd: token.userBalanceUsd,
+            isWalletToken: token.isWalletToken,
+          };
+        };
+
+        return {
+          // Only persist what we need and ensure we don't store providers
+          connectedWallets: state.connectedWallets.map((wallet) => ({
+            type: wallet.type,
+            name: wallet.name,
+            address: wallet.address,
+            chainId: wallet.chainId,
+          })),
+          activeWallet: state.activeWallet
+            ? {
+                type: state.activeWallet.type,
+                name: state.activeWallet.name,
+                address: state.activeWallet.address,
+                chainId: state.activeWallet.chainId,
+              }
+            : null,
+          sourceChain: state.sourceChain,
+          destinationChain: state.destinationChain,
+          // Serialize tokens for storage
+          sourceToken: serializeToken(state.sourceToken),
+          destinationToken: serializeToken(state.destinationToken),
+          // We don't need to persist tokens since they're loaded from the JSON files
+        };
+      },
     },
   ),
 );
@@ -244,6 +334,15 @@ export const useSourceChain = (): Chain => {
 
 export const useDestinationChain = (): Chain => {
   return useWeb3Store((state) => state.destinationChain);
+};
+
+// New hooks for the selected tokens
+export const useSourceToken = (): Token | null => {
+  return useWeb3Store((state) => state.sourceToken);
+};
+
+export const useDestinationToken = (): Token | null => {
+  return useWeb3Store((state) => state.destinationToken);
 };
 
 export const useTokensLoading = (): boolean => {

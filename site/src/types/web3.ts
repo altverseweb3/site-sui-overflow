@@ -41,34 +41,50 @@ export type Chain = {
 };
 
 export interface Web3StoreState {
-  // Connected wallets
-  connectedWallets: WalletInfo[];
-  activeWallet: WalletInfo | null;
+  // Wallet-related state
+  connectedWallets: Array<Omit<WalletInfo, "provider">>;
+  activeWallet: Omit<WalletInfo, "provider"> | null;
+
+  // Chain selection state
   sourceChain: Chain;
   destinationChain: Chain;
+
+  // Token selection state - new additions
+  sourceToken: Token | null;
+  destinationToken: Token | null;
+
+  // Token data state
   tokensByCompositeKey: Record<string, Token>;
   tokensByChainId: Record<number, Token[]>;
-  tokensByAddress: Record<number, Record<string, Token>>; // Renamed for clarity in store
+  tokensByAddress: Record<number, Record<string, Token>>;
   allTokensList: Token[];
   tokensLoading: boolean;
   tokensError: string | null;
 
-  // Actions
+  // Wallet actions
   addWallet: (wallet: WalletInfo) => void;
   removeWallet: (walletType: WalletType) => void;
-  setActiveWallet: (walletType: WalletType) => void; // allows user to switch between wallets
-  disconnectAll: () => void; // in case a user wants to completely log out
-  updateWalletChainId: (walletType: WalletType, chainId: number) => void; // allows chain switching on individual wallet connections
-  updateWalletAddress: (walletType: WalletType, address: string) => void; // allows user to seamlessly switch addresses
+  setActiveWallet: (walletType: WalletType) => void;
+  updateWalletAddress: (walletType: WalletType, address: string) => void;
+  updateWalletChainId: (walletType: WalletType, chainId: number) => void;
+  disconnectAll: () => void;
+
+  // Chain selection actions
   setSourceChain: (chain: Chain) => void;
   setDestinationChain: (chain: Chain) => void;
   swapChains: () => void;
 
-  // Token actions
+  // Token selection actions - new additions
+  setSourceToken: (token: Token | null) => void;
+  setDestinationToken: (token: Token | null) => void;
+  swapTokens: () => void;
+
+  // Token data actions
   loadTokens: () => Promise<void>;
   getWalletTokens: () => Token[];
   getAllTokens: () => Token[];
   getTokensForChain: (chainId: number) => Token[];
-  getTokenById: (id: string) => Token | undefined;
+  getTokenById: (compositeKey: string) => Token | undefined;
   getTokenByAddress: (address: string, chainId: number) => Token | undefined;
+  findTokenByAddressAnyChain: (address: string) => Token | undefined;
 }

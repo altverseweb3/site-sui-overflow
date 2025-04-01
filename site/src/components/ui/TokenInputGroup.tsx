@@ -3,7 +3,7 @@ import { SelectTokenButton } from "@/components/ui/SelectTokenButton";
 import { TokenAmountInput } from "@/components/ui/TokenAmountInput";
 
 interface TokenInputGroupProps {
-  variant: "send" | "receive";
+  variant: "source" | "destination"; // Use source/destination instead of send/receive
   amount: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   showSelectToken: boolean;

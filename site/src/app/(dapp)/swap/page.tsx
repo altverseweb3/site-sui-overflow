@@ -30,7 +30,6 @@ const SwapComponent: React.FC = () => {
             disabled: !amount || amount === "0",
           }}
         >
-          {/* Send Box */}
           <AssetBox
             title="send"
             showSettings={true}
@@ -39,7 +38,7 @@ const SwapComponent: React.FC = () => {
             boxType="source"
           >
             <TokenInputGroup
-              variant="send"
+              variant="source"
               amount={amount}
               onChange={handleAmountChange}
               showSelectToken={true}
@@ -48,7 +47,6 @@ const SwapComponent: React.FC = () => {
 
           <TokenSwitch />
 
-          {/* Receive Box */}
           <AssetBox
             title="receive"
             showSettings={false}
@@ -56,7 +54,7 @@ const SwapComponent: React.FC = () => {
             boxType="destination"
           >
             <TokenInputGroup
-              variant="receive"
+              variant="destination"
               amount=""
               readOnly={true}
               showSelectToken={true}
