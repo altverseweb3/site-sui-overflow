@@ -16,6 +16,7 @@ const SwapComponent: React.FC = () => {
     isLoadingQuote,
     sourceToken,
     destinationToken,
+    estimatedTimeSeconds,
   } = useTokenTransfer({
     type: "swap",
     onSuccess: (amount, sourceToken, destinationToken) => {
@@ -39,6 +40,7 @@ const SwapComponent: React.FC = () => {
       isLoadingQuote={isLoadingQuote}
       hasSourceToken={!!sourceToken}
       hasDestinationToken={!!destinationToken}
+      estimatedTimeSeconds={estimatedTimeSeconds}
     />
   );
 };

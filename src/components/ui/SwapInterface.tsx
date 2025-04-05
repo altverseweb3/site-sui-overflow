@@ -20,7 +20,7 @@ interface SwapInterfaceProps {
   exchangeRate?: string;
   exchangeValue?: string;
   gasFee?: string;
-  estimatedTime?: string;
+  estimatedTime?: string | number | null; // Allow null for estimated time
   enforceSourceChain?: boolean;
   renderActionButton?: () => ReactNode;
   detailsOpen?: boolean;
@@ -192,7 +192,7 @@ export function SwapInterface({
           exchangeRate={exchangeRate}
           exchangeValue={exchangeValue}
           gasFee={gasFee}
-          estimatedTime={estimatedTime}
+          estimatedTime={estimatedTime} // Pass number or string
           isOpen={detailsOpen}
           onToggle={onDetailsToggle}
         />

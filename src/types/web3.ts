@@ -79,7 +79,7 @@ export interface Web3StoreState {
 
   // Transaction details
   transactionDetails: {
-    slippage: string;
+    slippage: "auto" | string;
     receiveAddress: string | null;
   };
 
@@ -111,6 +111,6 @@ export interface Web3StoreState {
   findTokenByAddressAnyChain: (address: string) => Token | undefined;
 
   // Transaction details actions
-  setSlippageValue: (value: string) => void;
+  setSlippageValue: (value: "auto" | string) => void;
   setReceiveAddress: (address: string | null) => void;
 }

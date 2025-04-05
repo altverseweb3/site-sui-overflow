@@ -1,4 +1,3 @@
-// src/utils/mayanSwapMethods.ts
 import { fetchQuote, Quote } from "@mayanfinance/swap-sdk";
 import { Token, Chain } from "@/types/web3";
 
@@ -8,7 +7,7 @@ interface GetMayanQuoteParams {
   destinationToken: Token;
   sourceChain: Chain;
   destinationChain: Chain;
-  slippageBps?: number;
+  slippageBps?: "auto" | number;
   gasDrop?: number;
   referrer?: string;
   referrerBps?: number;
@@ -28,7 +27,7 @@ export async function getMayanQuote(
     destinationToken,
     sourceChain,
     destinationChain,
-    slippageBps = 300,
+    slippageBps = "auto", // Default to 'auto' instead of 300
     gasDrop,
     referrer,
     referrerBps,
@@ -52,6 +51,7 @@ export async function getMayanQuote(
     };
     console.log("fetching quote with params:");
     console.log(quoteParams);
+
     const quotes = await fetchQuote({
       amount: parseFloat(amount),
       fromToken: sourceToken.address,

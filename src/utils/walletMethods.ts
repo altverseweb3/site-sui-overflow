@@ -1,6 +1,6 @@
 import { WalletInfo, WalletType, Token, Chain } from "@/types/web3";
 import useWeb3Store from "@/store/web3Store";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { getMayanQuote } from "@/utils/mayanSwapMethods";
 import { Quote } from "@mayanfinance/swap-sdk";
@@ -391,6 +391,9 @@ interface TokenTransferState {
   receiveAmount: string;
   isLoadingQuote: boolean;
 
+  // Add estimated time in seconds from the quote
+  estimatedTimeSeconds: number | null;
+
   handleTransfer: () => Promise<void>;
 }
 
@@ -406,6 +409,9 @@ export function useTokenTransfer(
   const [quoteData, setQuoteData] = useState<Quote[] | null>(null);
   const [receiveAmount, setReceiveAmount] = useState<string>("");
   const [isLoadingQuote, setIsLoadingQuote] = useState<boolean>(false);
+  const [estimatedTimeSeconds, setEstimatedTimeSeconds] = useState<
+    number | null
+  >(null);
 
   // Get relevant state from the web3 store
   const activeWallet = useWeb3Store((state) => state.activeWallet);
@@ -413,8 +419,27 @@ export function useTokenTransfer(
   const destinationChain = useWeb3Store((state) => state.destinationChain);
   const sourceToken = useWeb3Store((state) => state.sourceToken);
   const destinationToken = useWeb3Store((state) => state.destinationToken);
+  // Get the transaction details for slippage
+  const transactionDetails = useWeb3Store((state) => state.transactionDetails);
 
   const latestRequestIdRef = useRef<number>(0);
+
+  // Convert slippage from string (e.g., "3.00%") to basis points (e.g., 300) or "auto"
+  const getSlippageBps = useCallback((): "auto" | number => {
+    if (!transactionDetails.slippage) return "auto"; // Default to 'auto'
+
+    if (transactionDetails.slippage === "auto") {
+      return "auto";
+    }
+
+    // Remove "%" and convert to number
+    const slippagePercent = parseFloat(
+      transactionDetails.slippage.replace("%", ""),
+    );
+
+    // Convert percentage to basis points (1% = 100 bps)
+    return Math.round(slippagePercent * 100);
+  }, [transactionDetails.slippage]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setAmount(e.target.value);
@@ -432,6 +457,7 @@ export function useTokenTransfer(
 
   const isButtonDisabled: boolean = !isValid || isProcessing || isLoadingQuote;
 
+  // Update this useEffect to include slippage in the dependency array
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -465,6 +491,9 @@ export function useTokenTransfer(
       try {
         let quotes: Quote[] = [];
 
+        // Get current slippage in basis points
+        const slippageBps = getSlippageBps();
+
         if (options.type === "swap" && sourceToken && destinationToken) {
           quotes = await getMayanQuote({
             amount,
@@ -472,6 +501,7 @@ export function useTokenTransfer(
             destinationToken,
             sourceChain,
             destinationChain,
+            slippageBps,
           });
         } else if (options.type === "bridge" && sourceToken) {
           quotes = await getMayanBridgeQuote({
@@ -479,6 +509,7 @@ export function useTokenTransfer(
             sourceToken,
             sourceChain,
             destinationChain,
+            slippageBps,
           });
         }
 
@@ -493,6 +524,14 @@ export function useTokenTransfer(
         if (quotes && quotes.length > 0) {
           const minAmountOut = quotes[0].minAmountOut;
 
+          // Extract ETA seconds from the first quote if available
+          if (quotes[0].etaSeconds !== undefined) {
+            setEstimatedTimeSeconds(quotes[0].etaSeconds);
+            console.log(`Estimated time: ${quotes[0].etaSeconds} seconds`);
+          } else {
+            setEstimatedTimeSeconds(null);
+          }
+
           // For bridging, we use the source token's decimals
           const token =
             options.type === "swap" ? destinationToken! : sourceToken!;
@@ -504,16 +543,20 @@ export function useTokenTransfer(
 
           setReceiveAmount(formattedAmount);
 
-          console.log(`${options.type.toUpperCase()} Receive Amount Updated:`, {
+          console.log(`${options.type.toUpperCase()} Quote Updated:`, {
             requestId: currentRequestId,
             amount: amount,
+            slippageBps: slippageBps,
             raw: minAmountOut,
             formatted: formattedAmount,
+            etaSeconds: quotes[0].etaSeconds,
           });
         } else {
           setReceiveAmount("");
+          setEstimatedTimeSeconds(null);
         }
       } catch (error: unknown) {
+        // Error handling code unchanged...
         // Check if this is still the latest request
         if (currentRequestId !== latestRequestIdRef.current) {
           return; // Ignore errors from stale requests
@@ -544,6 +587,7 @@ export function useTokenTransfer(
         toast.error(`Error: ${errorMessage}`);
         setQuoteData(null);
         setReceiveAmount("");
+        setEstimatedTimeSeconds(null);
       } finally {
         // Only update loading state if this is the latest request
         if (currentRequestId === latestRequestIdRef.current) {
@@ -574,6 +618,8 @@ export function useTokenTransfer(
     sourceChain,
     destinationChain,
     options.type,
+    transactionDetails.slippage, // Add slippage to the dependency array
+    getSlippageBps,
   ]);
 
   const handleTransfer = async (): Promise<void> => {
@@ -647,8 +693,8 @@ export function useTokenTransfer(
     isValid,
     isButtonDisabled,
     quoteData,
-    receiveAmount, // Expose the formatted receive amount
-    isLoadingQuote, // Expose the loading state
+    receiveAmount,
+    isLoadingQuote,
 
     // Store state
     activeWallet,
@@ -656,6 +702,7 @@ export function useTokenTransfer(
     destinationChain,
     sourceToken,
     destinationToken,
+    estimatedTimeSeconds,
 
     // Actions
     handleTransfer,
@@ -667,11 +714,13 @@ export async function getMayanBridgeQuote({
   sourceToken,
   sourceChain,
   destinationChain,
+  slippageBps = "auto", // Default to 'auto' slippage
 }: {
   amount: string;
   sourceToken: Token;
   sourceChain: Chain;
   destinationChain: Chain;
+  slippageBps?: "auto" | number;
 }): Promise<Quote[]> {
   return getMayanQuote({
     amount,
@@ -679,5 +728,6 @@ export async function getMayanBridgeQuote({
     destinationToken: sourceToken, // Same token on both chains
     sourceChain,
     destinationChain,
+    slippageBps, // Pass through the slippage parameter
   });
 }

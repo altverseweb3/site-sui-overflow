@@ -39,15 +39,27 @@ const useWeb3Store = create<Web3StoreState>()(
       tokensError: null,
 
       // Transaction details actions
-      setSlippageValue: (value: string) => {
-        // Ensure value has % suffix
-        const formattedValue = value.endsWith("%") ? value : `${value}%`;
-        set((state) => ({
-          transactionDetails: {
-            ...state.transactionDetails,
-            slippage: formattedValue,
-          },
-        }));
+      setSlippageValue: (value: "auto" | string) => {
+        set((state) => {
+          // If value is "auto", use it directly
+          if (value === "auto") {
+            return {
+              transactionDetails: {
+                ...state.transactionDetails,
+                slippage: "auto",
+              },
+            };
+          }
+
+          // Otherwise, ensure the value has % suffix for percentage values
+          const formattedValue = value.endsWith("%") ? value : `${value}%`;
+          return {
+            transactionDetails: {
+              ...state.transactionDetails,
+              slippage: formattedValue,
+            },
+          };
+        });
       },
 
       setReceiveAddress: (address: string | null) => {

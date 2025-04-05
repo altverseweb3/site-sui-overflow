@@ -14,6 +14,7 @@ const BridgeComponent: React.FC = () => {
     receiveAmount,
     isLoadingQuote,
     sourceToken,
+    estimatedTimeSeconds,
   } = useTokenTransfer({
     type: "bridge",
     onSuccess: (amount, sourceToken, destinationToken) => {
@@ -37,6 +38,7 @@ const BridgeComponent: React.FC = () => {
       isLoadingQuote={isLoadingQuote}
       hasSourceToken={!!sourceToken}
       hasDestinationToken={true}
+      estimatedTimeSeconds={estimatedTimeSeconds}
     />
   );
 };

@@ -18,7 +18,7 @@ interface TransactionDetailsProps {
   exchangeRate?: string;
   exchangeValue?: string;
   gasFee?: string;
-  estimatedTime?: string;
+  estimatedTime?: string | number | null; // Allow number for seconds or null
   className?: string;
   isOpen?: boolean;
   onToggle?: () => void;
@@ -28,7 +28,7 @@ export function TransactionDetails({
   exchangeRate = "1 USDC = 0.000362352 ETH",
   exchangeValue = "$1.00",
   gasFee = "<$0.01",
-  estimatedTime = "20s",
+  estimatedTime = "~",
   isOpen,
   onToggle,
 }: TransactionDetailsProps) {
@@ -46,11 +46,25 @@ export function TransactionDetails({
   const [isEditingReceiveAddress, setIsEditingReceiveAddress] = useState(false);
   const [receiveAddressInput, setReceiveAddressInput] = useState("");
 
-  // Max slippage - 15% is generally a reasonable upper limit for cross-chain swaps
-  const MAX_SLIPPAGE = 15;
+  const MAX_SLIPPAGE = 10;
+
+  // Default values
+  const DEFAULT_AUTO_SLIPPAGE = "auto";
+  const DEFAULT_CUSTOM_SLIPPAGE = "3.00%";
 
   // Ref for address input to handle click outside
   const receiveAddressInputRef = useRef<HTMLInputElement>(null);
+
+  // Format slippage value to ensure consistent format (always 2 decimal places with % sign)
+  const formatSlippageValue = (value: string): string => {
+    // Remove any % symbol first
+    const numericValue = parseFloat(value.replace("%", ""));
+
+    if (isNaN(numericValue)) return DEFAULT_AUTO_SLIPPAGE;
+
+    // Format to 2 decimal places and add % symbol
+    return `${numericValue.toFixed(2)}%`;
+  };
 
   // Wrap saveReceiveAddress in useCallback to prevent recreating on every render
   const saveReceiveAddress = useCallback(() => {
@@ -66,20 +80,36 @@ export function TransactionDetails({
     setIsEditingReceiveAddress(false);
   }, [receiveAddressInput, activeWallet, setReceiveAddress]);
 
-  // Initialize values from store
-  useEffect(() => {
-    // Set initial slippage value from store
-    if (transactionDetails.slippage) {
-      setCustomSlippage(transactionDetails.slippage.replace("%", ""));
-    }
+  // Initialize values from store - only run once on component mount
+  useEffect(
+    () => {
+      // Set initial slippage mode based on store value
+      const storeSlippage = transactionDetails.slippage;
 
-    // Set initial receive address
-    if (transactionDetails.receiveAddress) {
-      setReceiveAddressInput(transactionDetails.receiveAddress);
-    } else if (activeWallet) {
-      setReceiveAddressInput(activeWallet.address);
-    }
-  }, [transactionDetails, activeWallet]);
+      if (storeSlippage === "auto" || !storeSlippage) {
+        // If auto or missing, set mode to auto
+        setSlippageMode("auto");
+        // Ensure store has the auto value
+        if (storeSlippage !== "auto") {
+          setSlippageValue("auto");
+        }
+      } else {
+        // If anything else, set mode to custom
+        setSlippageMode("custom");
+        setCustomSlippage(storeSlippage.replace("%", ""));
+      }
+
+      // Set initial receive address
+      if (transactionDetails.receiveAddress) {
+        setReceiveAddressInput(transactionDetails.receiveAddress);
+      } else if (activeWallet) {
+        setReceiveAddressInput(activeWallet.address);
+      }
+    },
+    [
+      /* empty dependency array to run only once */
+    ],
+  );
 
   // Handle click outside for receive address editing
   useEffect(() => {
@@ -114,13 +144,59 @@ export function TransactionDetails({
     }
   };
 
+  const formatEstimatedTime = (
+    estimatedTime?: string | number | null,
+  ): string => {
+    // If not provided or invalid, return a default value
+    if (estimatedTime === null || estimatedTime === undefined) return "~";
+
+    // If it's already a formatted string (like "20s"), return it
+    if (typeof estimatedTime === "string" && isNaN(Number(estimatedTime))) {
+      return estimatedTime;
+    }
+
+    // Convert to number (handle both numeric strings and numbers)
+    const seconds =
+      typeof estimatedTime === "string"
+        ? parseInt(estimatedTime, 10)
+        : estimatedTime;
+
+    // Format based on duration
+    if (seconds < 60) {
+      return `${seconds}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.round(seconds / 60);
+      return `${minutes}m`;
+    } else {
+      const hours = Math.round((seconds / 3600) * 10) / 10; // Round to 1 decimal place
+      return `${hours}h`;
+    }
+  };
+
   const handleSlippageModeChange = (mode: "auto" | "custom") => {
     setSlippageMode(mode);
     setSlippageError(null);
 
     if (mode === "auto") {
-      // When switching to auto, use the stored slippage value
-      setSlippageValue("3.00");
+      // When switching to auto, use "auto" as the slippage value
+      setSlippageValue(DEFAULT_AUTO_SLIPPAGE);
+    } else if (mode === "custom") {
+      // When switching to custom, preserve the current input value if valid, otherwise use default 3.00%
+      if (customSlippage && !isNaN(parseFloat(customSlippage))) {
+        // Only update store if the custom value is already valid
+        const numericValue = parseFloat(customSlippage);
+        if (numericValue > 0 && numericValue <= MAX_SLIPPAGE) {
+          setSlippageValue(formatSlippageValue(customSlippage));
+        } else {
+          // If invalid, reset to default custom value
+          setCustomSlippage(DEFAULT_CUSTOM_SLIPPAGE.replace("%", ""));
+          setSlippageValue(DEFAULT_CUSTOM_SLIPPAGE);
+        }
+      } else {
+        // If no custom value exists, initialize with the default custom value
+        setCustomSlippage(DEFAULT_CUSTOM_SLIPPAGE.replace("%", ""));
+        setSlippageValue(DEFAULT_CUSTOM_SLIPPAGE);
+      }
     }
   };
 
@@ -133,7 +209,7 @@ export function TransactionDetails({
     if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
       setCustomSlippage(value);
 
-      // Validate the value
+      // Validate the value - just set error messages but don't update the store yet
       const numericValue = parseFloat(value);
       if (value && !isNaN(numericValue)) {
         if (numericValue > MAX_SLIPPAGE) {
@@ -142,12 +218,30 @@ export function TransactionDetails({
           setSlippageError("Slippage must be greater than 0%");
         } else {
           setSlippageError(null);
-          // Save to zustand store
-          setSlippageValue(`${value}%`);
         }
       } else {
         setSlippageError(null);
       }
+    }
+  };
+
+  // Handle custom slippage input blur
+  const handleCustomSlippageBlur = () => {
+    // Only update the store when the input loses focus and is valid
+    if (customSlippage && !slippageError) {
+      const numericValue = parseFloat(customSlippage);
+      if (
+        !isNaN(numericValue) &&
+        numericValue > 0 &&
+        numericValue <= MAX_SLIPPAGE
+      ) {
+        // Format consistently and update the store
+        const formattedValue = formatSlippageValue(customSlippage);
+        setSlippageValue(formattedValue);
+      }
+    } else if (customSlippage === "") {
+      // If empty, revert to auto mode
+      handleSlippageModeChange("auto");
     }
   };
 
@@ -182,7 +276,7 @@ export function TransactionDetails({
           </div>
           <div className="flex items-center space-x-1">
             <Clock size={14} />
-            <span>{estimatedTime}</span>
+            <span>{formatEstimatedTime(estimatedTime)}</span>
           </div>
           {isDetailsExpanded ? (
             <ChevronUp size={16} />
@@ -227,13 +321,14 @@ export function TransactionDetails({
               </div>
               <div className="numeric-input text-zinc-200 min-w-[60px] text-right">
                 {slippageMode === "auto" ? (
-                  transactionDetails.slippage
+                  <div className="text-amber-500">auto</div>
                 ) : (
                   <div className="flex items-center justify-end">
                     <input
                       type="text"
                       value={customSlippage}
                       onChange={handleCustomSlippageChange}
+                      onBlur={handleCustomSlippageBlur}
                       className={`bg-transparent text-right w-10 px-0 outline-none ${
                         slippageError ? "text-red-500" : "text-zinc-200"
                       }`}
