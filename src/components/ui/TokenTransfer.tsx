@@ -1,5 +1,5 @@
 // src/components/ui/TokenTransfer.tsx
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { Settings } from "lucide-react";
 import { AssetBox } from "@/components/ui/AssetBox";
 import { TokenInputGroup } from "@/components/ui/TokenInputGroup";
@@ -40,8 +40,14 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
   receiveAmount = "",
   isLoadingQuote = false,
 }) => {
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const toggleDetails = () => {
+    setIsDetailsOpen(!isDetailsOpen);
+  };
+
   const defaultSettingsButton = (
-    <button>
+    <button onClick={toggleDetails}>
       <Settings className="h-5 w-5 text-zinc-400 hover:text-zinc-50 transition-colors" />
     </button>
   );
@@ -135,6 +141,8 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           actionButton={actionButton}
           enforceSourceChain={hasActiveWallet}
           renderActionButton={renderButtonOrModal}
+          detailsOpen={isDetailsOpen}
+          onDetailsToggle={toggleDetails}
         >
           {transferContent}
         </SwapInterface>

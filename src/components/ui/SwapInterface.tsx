@@ -21,15 +21,10 @@ interface SwapInterfaceProps {
   exchangeValue?: string;
   gasFee?: string;
   estimatedTime?: string;
-  transactionDetails?: {
-    slippage: string;
-    fee: { percentage: string; value: string };
-    relayerFees: string;
-    sending: string;
-    receiving: string;
-  };
   enforceSourceChain?: boolean;
   renderActionButton?: () => ReactNode;
+  detailsOpen?: boolean;
+  onDetailsToggle?: () => void;
 }
 
 export function SwapInterface({
@@ -40,9 +35,10 @@ export function SwapInterface({
   exchangeValue,
   gasFee,
   estimatedTime,
-  transactionDetails,
   enforceSourceChain = true,
   renderActionButton,
+  detailsOpen,
+  onDetailsToggle,
 }: SwapInterfaceProps) {
   const {
     isLoading: isSwitchingChain,
@@ -197,7 +193,8 @@ export function SwapInterface({
           exchangeValue={exchangeValue}
           gasFee={gasFee}
           estimatedTime={estimatedTime}
-          transactionDetails={transactionDetails}
+          isOpen={detailsOpen}
+          onToggle={onDetailsToggle}
         />
       </CardContent>
     </Card>
