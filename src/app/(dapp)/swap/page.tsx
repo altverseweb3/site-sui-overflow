@@ -14,6 +14,8 @@ const SwapComponent: React.FC = () => {
     handleTransfer,
     receiveAmount,
     isLoadingQuote,
+    sourceToken,
+    destinationToken,
   } = useTokenTransfer({
     type: "swap",
     onSuccess: (amount, sourceToken, destinationToken) => {
@@ -35,6 +37,8 @@ const SwapComponent: React.FC = () => {
       showDestinationTokenSelector={true}
       receiveAmount={receiveAmount}
       isLoadingQuote={isLoadingQuote}
+      hasSourceToken={!!sourceToken}
+      hasDestinationToken={!!destinationToken}
     />
   );
 };

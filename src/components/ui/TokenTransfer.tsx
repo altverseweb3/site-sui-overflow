@@ -1,5 +1,4 @@
-// src/components/ui/TokenTransfer.tsx
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 import { AssetBox } from "@/components/ui/AssetBox";
 import { TokenInputGroup } from "@/components/ui/TokenInputGroup";
@@ -23,6 +22,9 @@ interface TokenTransferProps {
   settingsComponent?: ReactNode;
   receiveAmount?: string;
   isLoadingQuote?: boolean;
+  // Token selection state
+  hasSourceToken?: boolean;
+  hasDestinationToken?: boolean;
 }
 
 export const TokenTransfer: React.FC<TokenTransferProps> = ({
@@ -39,15 +41,22 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
   settingsComponent,
   receiveAmount = "",
   isLoadingQuote = false,
+  hasSourceToken = false,
+  hasDestinationToken = false,
 }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  // State to track if the input should be enabled
+  const [isInputEnabled, setIsInputEnabled] = useState(false);
 
-  const toggleDetails = () => {
-    setIsDetailsOpen(!isDetailsOpen);
-  };
+  useEffect(() => {
+    const shouldBeEnabled =
+      hasSourceToken &&
+      (showDestinationTokenSelector ? hasDestinationToken : true);
+
+    setIsInputEnabled(shouldBeEnabled);
+  }, [hasSourceToken, hasDestinationToken, showDestinationTokenSelector]);
 
   const defaultSettingsButton = (
-    <button onClick={toggleDetails}>
+    <button>
       <Settings className="h-5 w-5 text-zinc-400 hover:text-zinc-50 transition-colors" />
     </button>
   );
@@ -58,7 +67,6 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
   const defaultIconName: AvailableIconName =
     transferType === "swap" ? "Coins" : "Cable";
 
-  // Remove the isLoadingQuote condition from button text
   const buttonText = hasActiveWallet
     ? actionText || defaultButtonText
     : "connect wallet";
@@ -110,6 +118,7 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           amount={amount}
           onChange={onAmountChange}
           showSelectToken={true}
+          isEnabled={isInputEnabled}
         />
       </AssetBox>
 
@@ -141,8 +150,6 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           actionButton={actionButton}
           enforceSourceChain={hasActiveWallet}
           renderActionButton={renderButtonOrModal}
-          detailsOpen={isDetailsOpen}
-          onDetailsToggle={toggleDetails}
         >
           {transferContent}
         </SwapInterface>

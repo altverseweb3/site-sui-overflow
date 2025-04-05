@@ -10,14 +10,15 @@ const BridgeComponent: React.FC = () => {
     handleAmountChange,
     isButtonDisabled,
     activeWallet,
-    sourceChain,
-    destinationChain,
     handleTransfer,
+    receiveAmount,
+    isLoadingQuote,
+    sourceToken,
   } = useTokenTransfer({
     type: "bridge",
-    onSuccess: (amount, sourceToken) => {
+    onSuccess: (amount, sourceToken, destinationToken) => {
       console.log(
-        `Bridge succeeded: ${amount} ${sourceToken.ticker} from ${sourceChain.name} to ${destinationChain.name}`,
+        `Bridge succeeded: ${amount} ${sourceToken.ticker} → ${destinationToken?.ticker}`,
       );
     },
   });
@@ -32,6 +33,10 @@ const BridgeComponent: React.FC = () => {
       transferType="bridge"
       actionIcon="Cable"
       showDestinationTokenSelector={false}
+      receiveAmount={receiveAmount}
+      isLoadingQuote={isLoadingQuote}
+      hasSourceToken={!!sourceToken}
+      hasDestinationToken={true}
     />
   );
 };

@@ -306,6 +306,21 @@ const useWeb3Store = create<Web3StoreState>()(
         return localStorage;
       }),
       partialize: (state) => {
+        const serializeToken = (token: Token | null) => {
+          if (!token) return null;
+          return {
+            id: token.id,
+            name: token.name,
+            ticker: token.ticker,
+            icon: token.icon,
+            address: token.address,
+            decimals: token.decimals,
+            chainId: token.chainId,
+            userBalance: token.userBalance,
+            userBalanceUsd: token.userBalanceUsd,
+            isWalletToken: token.isWalletToken,
+          };
+        };
         return {
           // Only persist what we need and ensure we don't store providers
           connectedWallets: state.connectedWallets.map((wallet) => ({
@@ -325,6 +340,8 @@ const useWeb3Store = create<Web3StoreState>()(
           sourceChain: state.sourceChain,
           destinationChain: state.destinationChain,
           transactionDetails: state.transactionDetails,
+          sourceToken: serializeToken(state.sourceToken),
+          destinationToken: serializeToken(state.destinationToken),
         };
       },
     },

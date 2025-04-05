@@ -7,6 +7,7 @@ interface TokenAmountInputProps {
   readOnly?: boolean;
   placeholder?: string;
   isLoadingQuote?: boolean;
+  variant?: "source" | "destination"; // Add variant to distinguish receive amount
 }
 
 export function TokenAmountInput({
@@ -16,8 +17,13 @@ export function TokenAmountInput({
   readOnly = false,
   placeholder = "0",
   isLoadingQuote = false,
+  variant = "source",
 }: TokenAmountInputProps) {
   const isLoading = isLoadingQuote && readOnly;
+
+  // Only apply the faded style for disabled source inputs
+  // For destination/receive inputs, we want them to look normal even when readOnly
+  const shouldApplyDisabledStyle = readOnly && variant === "source";
 
   return (
     <div className="flex-1 flex flex-col items-end">
@@ -31,8 +37,11 @@ export function TokenAmountInput({
           value={amount}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full bg-transparent text-3xl focus:outline-none text-right numeric-input [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className={`w-full bg-transparent text-3xl focus:outline-none text-right numeric-input [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+            shouldApplyDisabledStyle ? "opacity-70" : ""
+          }`}
           readOnly={readOnly}
+          disabled={readOnly}
         />
       )}
       <span className="text-zinc-400 text-sm numeric-input">{dollarValue}</span>

@@ -421,14 +421,10 @@ export function useTokenTransfer(
   };
 
   const isValidForSwap = Boolean(
-    activeWallet &&
-      sourceToken &&
-      destinationToken &&
-      amount &&
-      parseFloat(amount) > 0,
+    sourceToken && destinationToken && amount && parseFloat(amount) > 0,
   );
   const isValidForBridge = Boolean(
-    activeWallet && sourceToken && amount && parseFloat(amount) > 0,
+    sourceToken && amount && parseFloat(amount) > 0,
   );
 
   const isValid: boolean =
@@ -440,12 +436,22 @@ export function useTokenTransfer(
     let timeoutId: NodeJS.Timeout;
 
     const fetchQuote = async () => {
-      if (
-        options.type !== "swap" ||
-        !isValidForSwap ||
-        !sourceToken ||
-        !destinationToken
-      ) {
+      // Reset if no valid amount
+      if (!amount || parseFloat(amount) <= 0) {
+        setQuoteData(null);
+        setReceiveAmount("");
+        return;
+      }
+
+      // For swap: Check if we have both source and destination tokens
+      if (options.type === "swap" && (!sourceToken || !destinationToken)) {
+        setQuoteData(null);
+        setReceiveAmount("");
+        return;
+      }
+
+      // For bridge: Check if we have source token
+      if (options.type === "bridge" && !sourceToken) {
         setQuoteData(null);
         setReceiveAmount("");
         return;
@@ -457,13 +463,24 @@ export function useTokenTransfer(
       const currentRequestId = ++latestRequestIdRef.current;
 
       try {
-        const quotes = await getMayanQuote({
-          amount,
-          sourceToken,
-          destinationToken,
-          sourceChain,
-          destinationChain,
-        });
+        let quotes: Quote[] = [];
+
+        if (options.type === "swap" && sourceToken && destinationToken) {
+          quotes = await getMayanQuote({
+            amount,
+            sourceToken,
+            destinationToken,
+            sourceChain,
+            destinationChain,
+          });
+        } else if (options.type === "bridge" && sourceToken) {
+          quotes = await getMayanBridgeQuote({
+            amount,
+            sourceToken,
+            sourceChain,
+            destinationChain,
+          });
+        }
 
         // Check if this is still the latest request
         if (currentRequestId !== latestRequestIdRef.current) {
@@ -476,14 +493,18 @@ export function useTokenTransfer(
         if (quotes && quotes.length > 0) {
           const minAmountOut = quotes[0].minAmountOut;
 
-          const decimals = destinationToken.decimals || 6;
+          // For bridging, we use the source token's decimals
+          const token =
+            options.type === "swap" ? destinationToken! : sourceToken!;
+          const decimals = token.decimals || 6;
+
           const formattedAmount = parseFloat(minAmountOut.toString()).toFixed(
             Math.min(decimals, 6),
           );
 
           setReceiveAmount(formattedAmount);
 
-          console.log("Receive Amount Updated:", {
+          console.log(`${options.type.toUpperCase()} Receive Amount Updated:`, {
             requestId: currentRequestId,
             amount: amount,
             raw: minAmountOut,
@@ -553,7 +574,6 @@ export function useTokenTransfer(
     sourceChain,
     destinationChain,
     options.type,
-    isValidForSwap,
   ]);
 
   const handleTransfer = async (): Promise<void> => {
@@ -640,4 +660,24 @@ export function useTokenTransfer(
     // Actions
     handleTransfer,
   };
+}
+
+export async function getMayanBridgeQuote({
+  amount,
+  sourceToken,
+  sourceChain,
+  destinationChain,
+}: {
+  amount: string;
+  sourceToken: Token;
+  sourceChain: Chain;
+  destinationChain: Chain;
+}): Promise<Quote[]> {
+  return getMayanQuote({
+    amount,
+    sourceToken,
+    destinationToken: sourceToken, // Same token on both chains
+    sourceChain,
+    destinationChain,
+  });
 }

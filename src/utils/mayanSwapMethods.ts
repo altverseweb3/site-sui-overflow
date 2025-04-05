@@ -39,6 +39,19 @@ export async function getMayanQuote(
   }
 
   try {
+    const quoteParams = {
+      amount: parseFloat(amount),
+      fromToken: sourceToken.address,
+      toToken: destinationToken.address,
+      fromChain: sourceChain.mayanName,
+      toChain: destinationChain.mayanName,
+      slippageBps,
+      gasDrop,
+      referrer,
+      referrerBps,
+    };
+    console.log("fetching quote with params:");
+    console.log(quoteParams);
     const quotes = await fetchQuote({
       amount: parseFloat(amount),
       fromToken: sourceToken.address,
