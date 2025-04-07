@@ -1,4 +1,5 @@
 import React from "react";
+import { NumberTicker } from "@/components/ui/NumberTicker";
 
 interface TokenAmountInputProps {
   amount: string;
@@ -31,6 +32,17 @@ export function TokenAmountInput({
         <div className="w-full animate-pulse text-3xl text-right text-zinc-400">
           loading...
         </div>
+      ) : variant === "destination" ? (
+        <NumberTicker
+          value={Number(amount)}
+          decimalPlaces={3}
+          // Add these parameters for much faster animation
+          stiffness={500}
+          damping={90}
+          className={`w-full bg-transparent text-3xl focus:outline-none text-right numeric-input [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+            shouldApplyDisabledStyle ? "opacity-70" : ""
+          }`}
+        />
       ) : (
         <input
           type="number"
