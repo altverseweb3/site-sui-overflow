@@ -424,6 +424,13 @@ export function useTokenTransfer(
 
   const latestRequestIdRef = useRef<number>(0);
 
+  const failQuote = () => {
+    setQuoteData(null);
+    setReceiveAmount("");
+    setIsLoadingQuote(false);
+    setEstimatedTimeSeconds(null);
+  };
+
   // Convert slippage from string (e.g., "3.00%") to basis points (e.g., 300) or "auto"
   const getSlippageBps = useCallback((): "auto" | number => {
     if (!transactionDetails.slippage) return "auto"; // Default to 'auto'
@@ -462,24 +469,25 @@ export function useTokenTransfer(
     let timeoutId: NodeJS.Timeout;
 
     const fetchQuote = async () => {
+      if (!isValid) {
+        failQuote();
+        return;
+      }
       // Reset if no valid amount
       if (!amount || parseFloat(amount) <= 0) {
-        setQuoteData(null);
-        setReceiveAmount("");
+        failQuote();
         return;
       }
 
       // For swap: Check if we have both source and destination tokens
       if (options.type === "swap" && (!sourceToken || !destinationToken)) {
-        setQuoteData(null);
-        setReceiveAmount("");
+        failQuote();
         return;
       }
 
       // For bridge: Check if we have source token
       if (options.type === "bridge" && !sourceToken) {
-        setQuoteData(null);
-        setReceiveAmount("");
+        failQuote();
         return;
       }
 
@@ -552,8 +560,7 @@ export function useTokenTransfer(
             etaSeconds: quotes[0].etaSeconds,
           });
         } else {
-          setReceiveAmount("");
-          setEstimatedTimeSeconds(null);
+          failQuote();
         }
       } catch (error: unknown) {
         // Error handling code unchanged...
@@ -585,9 +592,7 @@ export function useTokenTransfer(
         }
 
         toast.error(`Error: ${errorMessage}`);
-        setQuoteData(null);
-        setReceiveAmount("");
-        setEstimatedTimeSeconds(null);
+        failQuote();
       } finally {
         // Only update loading state if this is the latest request
         if (currentRequestId === latestRequestIdRef.current) {
@@ -603,9 +608,7 @@ export function useTokenTransfer(
       // Add a small debounce to avoid excessive API calls
       timeoutId = setTimeout(fetchQuote, 300);
     } else {
-      setQuoteData(null);
-      setReceiveAmount("");
-      setIsLoadingQuote(false);
+      failQuote();
     }
 
     return () => {

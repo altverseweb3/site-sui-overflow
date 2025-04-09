@@ -57,6 +57,7 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
 }) => {
   // State to track if the input should be enabled
   const [isInputEnabled, setIsInputEnabled] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     const shouldBeEnabled =
@@ -67,7 +68,7 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
   }, [hasSourceToken, hasDestinationToken, showDestinationTokenSelector]);
 
   const defaultSettingsButton = (
-    <button>
+    <button onClick={() => setShowDetails(!showDetails)}>
       <Settings className="h-5 w-5 text-zinc-400 hover:text-zinc-50 transition-colors" />
     </button>
   );
@@ -166,6 +167,8 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           exchangeValue={exchangeValue}
           gasFee={gasFee}
           estimatedTime={estimatedTimeSeconds} // Pass the ETA from quote
+          detailsOpen={showDetails}
+          onDetailsToggle={() => setShowDetails(!showDetails)}
         >
           {transferContent}
         </SwapInterface>
