@@ -17,6 +17,11 @@ const SwapComponent: React.FC = () => {
     sourceToken,
     destinationToken,
     estimatedTimeSeconds,
+    totalFeeUsd,
+    protocolFeeUsd,
+    relayerFeeUsd,
+    sourceAmountUsd,
+    destinationAmountUsd,
   } = useTokenTransfer({
     type: "swap",
     onSuccess: (amount, sourceToken, destinationToken) => {
@@ -41,6 +46,11 @@ const SwapComponent: React.FC = () => {
       hasSourceToken={!!sourceToken}
       hasDestinationToken={!!destinationToken}
       estimatedTimeSeconds={estimatedTimeSeconds}
+      protocolFeeUsd={protocolFeeUsd ?? undefined}
+      relayerFeeUsd={relayerFeeUsd ?? undefined}
+      totalFeeUsd={totalFeeUsd ?? undefined}
+      sourceAmountUsd={sourceAmountUsd ?? undefined}
+      destinationAmountUsd={destinationAmountUsd ?? undefined}
     />
   );
 };

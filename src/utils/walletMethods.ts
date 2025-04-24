@@ -402,7 +402,24 @@ interface TokenTransferState {
   // Add estimated time in seconds from the quote
   estimatedTimeSeconds: number | null;
 
+  // Add fee information
+  protocolFeeBps: number | null;
+  protocolFeeUsd: number | null;
+  relayerFeeUsd: number | null;
+  totalFeeUsd: number | null;
+
+  sourceTokenPrice: number | null;
+  destinationTokenPrice: number | null;
+
+  sourceAmountUsd: number | null; // USD value of input amount
+  destinationAmountUsd: number | null; // USD value of output amount
+
   handleTransfer: () => Promise<void>;
+}
+
+// I had to include this as it appears the Mayan SDK is outdated
+interface ExtendedQuote extends Quote {
+  toTokenPrice?: number;
 }
 
 /**
@@ -418,6 +435,21 @@ export function useTokenTransfer(
   const [receiveAmount, setReceiveAmount] = useState<string>("");
   const [isLoadingQuote, setIsLoadingQuote] = useState<boolean>(false);
   const [estimatedTimeSeconds, setEstimatedTimeSeconds] = useState<
+    number | null
+  >(null);
+
+  // Add state for fee information
+  const [protocolFeeBps, setProtocolFeeBps] = useState<number | null>(null);
+  const [protocolFeeUsd, setProtocolFeeUsd] = useState<number | null>(null);
+  const [relayerFeeUsd, setRelayerFeeUsd] = useState<number | null>(null);
+  const [totalFeeUsd, setTotalFeeUsd] = useState<number | null>(null);
+
+  const [sourceTokenPrice, setSourceTokenPrice] = useState<number | null>(null);
+  const [destinationTokenPrice, setDestinationTokenPrice] = useState<
+    number | null
+  >(null);
+  const [sourceAmountUsd, setSourceAmountUsd] = useState<number | null>(null);
+  const [destinationAmountUsd, setDestinationAmountUsd] = useState<
     number | null
   >(null);
 
@@ -437,6 +469,15 @@ export function useTokenTransfer(
     setReceiveAmount("");
     setIsLoadingQuote(false);
     setEstimatedTimeSeconds(null);
+    // Reset fee information
+    setProtocolFeeBps(null);
+    setProtocolFeeUsd(null);
+    setRelayerFeeUsd(null);
+    setTotalFeeUsd(null);
+    setSourceTokenPrice(null);
+    setDestinationTokenPrice(null);
+    setSourceAmountUsd(null);
+    setDestinationAmountUsd(null);
   };
 
   // Convert slippage from string (e.g., "3.00%") to basis points (e.g., 300) or "auto"
@@ -472,7 +513,7 @@ export function useTokenTransfer(
 
   const isButtonDisabled: boolean = !isValid || isProcessing || isLoadingQuote;
 
-  // Update this useEffect to include slippage in the dependency array
+  // Update this useEffect to include fee calculation
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -538,14 +579,111 @@ export function useTokenTransfer(
         setQuoteData(quotes);
 
         if (quotes && quotes.length > 0) {
-          const minAmountOut = quotes[0].minAmountOut;
+          // Cast the quote to ExtendedQuote to access additional properties
+          const quote = quotes[0] as ExtendedQuote;
+          const expectedAmountOut = quote.expectedAmountOut;
+          const inputAmount = parseFloat(amount);
+          const outputAmount = expectedAmountOut;
 
-          // Extract ETA seconds from the first quote if available
-          if (quotes[0].etaSeconds !== undefined) {
-            setEstimatedTimeSeconds(quotes[0].etaSeconds);
-            console.log(`Estimated time: ${quotes[0].etaSeconds} seconds`);
+          // Extract ETA seconds if available
+          if (quote.etaSeconds !== undefined) {
+            setEstimatedTimeSeconds(quote.etaSeconds);
+            console.log(`Estimated time: ${quote.etaSeconds} seconds`);
           } else {
             setEstimatedTimeSeconds(null);
+          }
+
+          // Calculate and set fee information
+          // Protocol fee in BPS
+          if (quote.protocolBps !== undefined) {
+            setProtocolFeeBps(quote.protocolBps);
+
+            // Calculate protocol fee in USD
+            const protocolFeeUsdValue =
+              inputAmount * (quote.protocolBps / 10000);
+            setProtocolFeeUsd(parseFloat(protocolFeeUsdValue.toFixed(6)));
+
+            console.log(
+              `Protocol fee: ${quote.protocolBps} BPS (${protocolFeeUsdValue.toFixed(6)} USD)`,
+            );
+          } else {
+            setProtocolFeeBps(null);
+            setProtocolFeeUsd(null);
+          }
+
+          // Relayer fee in USD
+          let relayerFee = null;
+          if (
+            quote.clientRelayerFeeSuccess !== undefined &&
+            quote.clientRelayerFeeSuccess !== null
+          ) {
+            relayerFee = quote.clientRelayerFeeSuccess;
+          } else if (
+            quote.clientRelayerFeeRefund !== undefined &&
+            quote.clientRelayerFeeRefund !== null
+          ) {
+            relayerFee = quote.clientRelayerFeeRefund;
+          }
+
+          if (relayerFee !== null) {
+            setRelayerFeeUsd(parseFloat(relayerFee.toFixed(6)));
+            console.log(`Relayer fee: ${relayerFee.toFixed(6)} USD`);
+          } else {
+            setRelayerFeeUsd(null);
+          }
+
+          // Calculate total fee - the difference between input and expected output
+          const totalFee = inputAmount - outputAmount;
+
+          if (!isNaN(totalFee)) {
+            setTotalFeeUsd(parseFloat(totalFee.toFixed(6)));
+            console.log(`Total fee: ${totalFee.toFixed(6)} USD`);
+          } else {
+            setTotalFeeUsd(null);
+          }
+
+          // Extract token prices and calculate USD values
+          // Source token price from the price field
+          if (quote.price !== undefined) {
+            setSourceTokenPrice(quote.price);
+            console.log(`Source token price: $${quote.price}`);
+
+            // Calculate USD value of source amount
+            if (!isNaN(inputAmount)) {
+              const sourceAmountUsdValue = inputAmount * quote.price;
+              setSourceAmountUsd(parseFloat(sourceAmountUsdValue.toFixed(2)));
+              console.log(
+                `Source amount in USD: $${sourceAmountUsdValue.toFixed(2)}`,
+              );
+            } else {
+              setSourceAmountUsd(null);
+            }
+          } else {
+            setSourceTokenPrice(null);
+            setSourceAmountUsd(null);
+          }
+
+          // Destination token price from toTokenPrice field (using ExtendedQuote)
+          if (quote.toTokenPrice !== undefined) {
+            setDestinationTokenPrice(quote.toTokenPrice);
+            console.log(`Destination token price: $${quote.toTokenPrice}`);
+
+            // Calculate USD value of destination amount
+            if (!isNaN(outputAmount)) {
+              const destinationAmountUsdValue =
+                outputAmount * quote.toTokenPrice;
+              setDestinationAmountUsd(
+                parseFloat(destinationAmountUsdValue.toFixed(2)),
+              );
+              console.log(
+                `Destination amount in USD: $${destinationAmountUsdValue.toFixed(2)}`,
+              );
+            } else {
+              setDestinationAmountUsd(null);
+            }
+          } else {
+            setDestinationTokenPrice(null);
+            setDestinationAmountUsd(null);
           }
 
           // For bridging, we use the source token's decimals
@@ -553,9 +691,9 @@ export function useTokenTransfer(
             options.type === "swap" ? destinationToken! : sourceToken!;
           const decimals = token.decimals || 6;
 
-          const formattedAmount = parseFloat(minAmountOut.toString()).toFixed(
-            Math.min(decimals, 6),
-          );
+          const formattedAmount = parseFloat(
+            expectedAmountOut.toString(),
+          ).toFixed(Math.min(decimals, 6));
 
           setReceiveAmount(formattedAmount);
 
@@ -563,9 +701,16 @@ export function useTokenTransfer(
             requestId: currentRequestId,
             amount: amount,
             slippageBps: slippageBps,
-            raw: minAmountOut,
+            raw: expectedAmountOut,
             formatted: formattedAmount,
-            etaSeconds: quotes[0].etaSeconds,
+            etaSeconds: quote.etaSeconds,
+            protocolBps: quote.protocolBps,
+            relayerFee: relayerFee,
+            totalFee: totalFee,
+            sourceTokenPrice: sourceTokenPrice,
+            destinationTokenPrice: destinationTokenPrice,
+            sourceAmountUsd: sourceAmountUsd,
+            destinationAmountUsd: destinationAmountUsd,
           });
         } else {
           failQuote();
@@ -629,7 +774,7 @@ export function useTokenTransfer(
     sourceChain,
     destinationChain,
     options.type,
-    transactionDetails.slippage, // Add slippage to the dependency array
+    transactionDetails.slippage,
     getSlippageBps,
   ]);
 
@@ -751,6 +896,16 @@ export function useTokenTransfer(
     sourceToken,
     destinationToken,
     estimatedTimeSeconds,
+
+    // Fee information
+    protocolFeeBps,
+    protocolFeeUsd,
+    relayerFeeUsd,
+    totalFeeUsd,
+    sourceTokenPrice,
+    destinationTokenPrice,
+    sourceAmountUsd,
+    destinationAmountUsd,
 
     // Actions
     handleTransfer,
