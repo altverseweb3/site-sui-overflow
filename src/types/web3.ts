@@ -57,6 +57,7 @@ export type Chain = {
   decimals: number;
   testnet?: boolean;
   l2: boolean;
+  gasDrop: number;
 };
 
 export interface Web3StoreState {
@@ -84,6 +85,7 @@ export interface Web3StoreState {
   transactionDetails: {
     slippage: "auto" | string;
     receiveAddress: string | null;
+    gasDrop: number;
   };
 
   tokenBalancesByWallet: Record<string, Record<string, string>>; // chainId_walletAddress -> tokenAddress -> balance
@@ -115,6 +117,7 @@ export interface Web3StoreState {
   // Transaction details actions
   setSlippageValue: (value: "auto" | string) => void;
   setReceiveAddress: (address: string | null) => void;
+  setGasDrop: (gasDrop: number) => void;
 
   updateTokenBalances: (
     chainId: number,
