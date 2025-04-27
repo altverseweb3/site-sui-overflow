@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
 import useWeb3Store from "@/store/web3Store";
-import { getPricesAndBalancesForActiveWallet } from "@/utils/tokenApiMethods";
+import { getPricesAndBalances } from "@/utils/tokenApiMethods";
 
 /**
  * Component that initializes token data on dApp startup.
@@ -16,6 +16,8 @@ const TokenInitializer: React.FC = () => {
   const sourceChain = useWeb3Store((state) => state.sourceChain);
   const destinationChain = useWeb3Store((state) => state.destinationChain);
   const activeWallet = useWeb3Store((state) => state.activeWallet);
+  const destinationToken = useWeb3Store((state) => state.destinationToken);
+  const sourceToken = useWeb3Store((state) => state.sourceToken);
 
   // Track whether the user is active or idle
   const [isIdle, setIsIdle] = useState(false);
@@ -30,19 +32,19 @@ const TokenInitializer: React.FC = () => {
 
   useEffect(() => {
     // Fetch prices and balances for the active wallet
-    if (sourceChain && destinationChain && tokenCount && activeWallet) {
+    if (sourceChain && destinationChain && tokenCount) {
       // Function to fetch data
       const fetchData = () => {
         if (!isIdle) {
           console.log("Fetching token data - user is active");
-          getPricesAndBalancesForActiveWallet();
+          getPricesAndBalances();
         } else {
           console.log("Skipping token data fetch - user is idle");
         }
       };
 
       // Initial fetch when dependencies change (regardless of idle state)
-      getPricesAndBalancesForActiveWallet();
+      getPricesAndBalances();
 
       // Set up interval to run every 10 seconds
       const intervalId = setInterval(fetchData, 10000); // 10 seconds
@@ -50,7 +52,15 @@ const TokenInitializer: React.FC = () => {
       // Clean up interval when component unmounts or dependencies change
       return () => clearInterval(intervalId);
     }
-  }, [sourceChain, destinationChain, tokenCount, activeWallet, isIdle]);
+  }, [
+    sourceChain,
+    destinationChain,
+    tokenCount,
+    activeWallet,
+    isIdle,
+    destinationToken,
+    sourceToken,
+  ]);
 
   return null;
 };

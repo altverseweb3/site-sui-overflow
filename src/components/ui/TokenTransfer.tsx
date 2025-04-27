@@ -7,7 +7,9 @@ import { TokenSwitch } from "@/components/ui/TokenSwitch";
 import { ConnectWalletModal } from "@/components/ui/ConnectWalletModal";
 import { BrandedButton } from "@/components/ui/BrandedButton";
 import { AvailableIconName } from "@/types/ui";
+import { swapChains } from "@/utils/chainMethods";
 import useWeb3Store from "@/store/web3Store";
+import { Token } from "@/types/web3";
 
 interface TokenTransferProps {
   amount: string;
@@ -30,8 +32,6 @@ interface TokenTransferProps {
   protocolFeeUsd?: number;
   relayerFeeUsd?: number;
   totalFeeUsd?: number;
-  sourceAmountUsd?: number;
-  destinationAmountUsd?: number;
 }
 
 export const TokenTransfer: React.FC<TokenTransferProps> = ({
@@ -55,13 +55,17 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
   protocolFeeUsd = 0,
   relayerFeeUsd = 0,
   totalFeeUsd = 0,
-  sourceAmountUsd = 0,
-  destinationAmountUsd = 0,
 }) => {
   // State to track if the input should be enabled
   const [isInputEnabled, setIsInputEnabled] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const swapChains = useWeb3Store((state) => state.swapChains);
+  const [sourceAmountValue, setSourceAmountValue] = useState(0);
+  const [destinationAmountValue, setDestinationAmountValue] = useState(0);
+  const tokensByCompositeKey = useWeb3Store(
+    (state) => state.tokensByCompositeKey,
+  );
+  const destinationToken = useWeb3Store((state) => state.destinationToken);
+  const sourceToken = useWeb3Store((state) => state.sourceToken);
 
   useEffect(() => {
     const shouldBeEnabled =
@@ -70,6 +74,32 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
 
     setIsInputEnabled(shouldBeEnabled);
   }, [hasSourceToken, hasDestinationToken, showDestinationTokenSelector]);
+
+  useEffect(() => {
+    // Helper function to calculate USD value for a token and amount
+    const calculateUsdValue = (token: Token | null, amount: string) => {
+      if (!token?.chainId || !token?.address) return 0;
+
+      const compositeKey = `${token.chainId}-${token.address}`;
+      const tokenValue = tokensByCompositeKey[compositeKey];
+
+      if (!tokenValue?.priceUsd) return 0;
+
+      return Number(amount) * Number(tokenValue.priceUsd);
+    };
+
+    // Calculate and set values in one go
+    setSourceAmountValue(calculateUsdValue(sourceToken, amount));
+    setDestinationAmountValue(
+      calculateUsdValue(destinationToken, receiveAmount),
+    );
+  }, [
+    tokensByCompositeKey,
+    sourceToken,
+    destinationToken,
+    amount,
+    receiveAmount,
+  ]);
 
   const defaultSettingsButton = (
     <button onClick={() => setShowDetails(!showDetails)}>
@@ -133,7 +163,7 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           onChange={onAmountChange}
           showSelectToken={true}
           isEnabled={isInputEnabled}
-          dollarValue={sourceAmountUsd}
+          dollarValue={sourceAmountValue}
         />
       </AssetBox>
 
@@ -155,7 +185,7 @@ export const TokenTransfer: React.FC<TokenTransferProps> = ({
           readOnly={true}
           showSelectToken={showDestinationTokenSelector}
           isLoadingQuote={isLoadingQuote}
-          dollarValue={destinationAmountUsd}
+          dollarValue={destinationAmountValue}
         />
       </AssetBox>
     </>
