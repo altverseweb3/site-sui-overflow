@@ -1,292 +1,501 @@
+// utils/walletMethods.ts
+
 import { WalletInfo, WalletType, Token, Chain } from "@/types/web3";
 import useWeb3Store from "@/store/web3Store";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { toast } from "sonner";
-import { getMayanQuote, executeEvmSwap } from "@/utils/mayanSwapMethods";
+import {
+  useAppKitAccount,
+  useAppKit,
+  useDisconnect,
+  useAppKitNetwork,
+  useWalletInfo,
+} from "@reown/appkit/react";
+import { ChainNamespace, SolanaSigner } from "@/types/web3";
+import { defineChain } from "@reown/appkit/networks";
+import {
+  getMayanQuote,
+  executeEvmSwap,
+  executeSolanaSwap,
+  executeSuiSwap,
+} from "@/utils/mayanSwapMethods";
 import { Quote } from "@mayanfinance/swap-sdk";
-import { ethers } from "ethers";
+import { toast } from "sonner";
+import { useWalletProviderAndSigner } from "@/utils/mayanSwapMethods";
+import { Connection } from "@solana/web3.js";
+import { useWallet } from "@suiet/wallet-kit"; // Import Suiet hook
 
-function getEthersProvider(): ethers.BrowserProvider {
-  if (typeof window === "undefined" || !window.ethereum) {
-    throw new Error("MetaMask not installed");
-  }
-  return new ethers.BrowserProvider(window.ethereum);
+/**
+ * Creates a properly formatted CAIP network ID with correct TypeScript typing
+ * @param namespace The chain namespace (eip155, solana, etc)
+ * @param chainId The chain ID
+ * @returns A properly typed CAIP network ID
+ */
+function createCaipNetworkId(
+  namespace: "eip155" | "solana" | "bip122" | "polkadot",
+  chainId: number,
+): `${typeof namespace}:${number}` {
+  return `${namespace}:${chainId}` as `${typeof namespace}:${number}`;
 }
 
-export async function connectMetamask(): Promise<WalletInfo | null> {
-  if (!window.ethereum) {
-    throw new Error("Metamask not installed");
-  }
+/**
+ * Custom hook for wallet connections via Reown AppKit
+ * Handles both EVM (MetaMask) and Solana (Phantom) wallets through Reown
+ * Also handles Sui wallets through Suiet
+ * Supports connecting to multiple wallet types simultaneously
+ */
+export function useWalletConnection() {
+  // Get the Reown AppKit modal control functions
+  const { open, close } = useAppKit();
 
-  try {
-    const accounts = await window.ethereum.request<string[]>({
-      method: "eth_requestAccounts",
-    });
+  // Track the wallet accounts for each namespace
+  const evmAccount = useAppKitAccount({ namespace: "eip155" });
+  const solanaAccount = useAppKitAccount({ namespace: "solana" });
 
-    const chainId = await window.ethereum.request<string>({
-      method: "eth_chainId",
-    });
+  // Get Sui wallet info from Suiet
+  const {
+    connected: suiConnected,
+    address: suiAddress,
+    name: suiWalletName,
+    disconnect: disconnectSui,
+  } = useWallet();
 
-    if (!accounts || accounts.length === 0 || !accounts[0]) {
-      throw new Error("No accounts found");
-    }
+  // Get wallet information for each namespace
+  const { walletInfo: evmWalletInfo } = useWalletInfo();
+  const { walletInfo: solanaWalletInfo } = useWalletInfo();
 
-    const address = accounts[0];
+  // Get network/chain info for each namespace
+  const evmNetwork = useAppKitNetwork();
+  const solanaNetwork = useAppKitNetwork();
 
-    if (!chainId) {
-      throw new Error("No chainId found");
-    }
+  // Track connection status in local state
+  const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const walletInfo: WalletInfo = {
-      type: WalletType.METAMASK,
-      name: "MetaMask",
-      address,
-      chainId: parseInt(chainId, 16),
-    };
+  // Track which namespaces are connected
+  const [connectedNamespaces, setConnectedNamespaces] = useState<{
+    evm: boolean;
+    solana: boolean;
+    sui: boolean; // Add Sui to connected namespaces
+  }>({ evm: false, solana: false, sui: false });
 
-    // Update the store immediately on connection
-    const store = useWeb3Store.getState();
-    store.addWallet(walletInfo);
+  /**
+   * Helper function to sync wallet data to our store
+   */
+  const syncWalletToStore = useCallback(
+    (
+      walletType: WalletType,
+      address: string,
+      walletName: string,
+      currentChainId?: string | number,
+    ) => {
+      // Map of known Solana network IDs
+      const solanaNetworkMap: Record<string, number> = {
+        "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": 101, // Mainnet
+        // Add other Solana networks as needed
+      };
 
-    // Set up account change listener
-    window.ethereum.on("accountsChanged", (accounts: unknown) => {
-      const store = useWeb3Store.getState();
-      const newAccounts = accounts as string[];
-      if (!newAccounts || newAccounts.length === 0) {
-        // MetaMask was locked or disconnected
-        store.removeWallet(WalletType.METAMASK);
+      // Map for Sui networks (add appropriate mappings)
+      const suiNetworkMap: Record<string, number> = {
+        mainnet: 1, // Sui mainnet
+        testnet: 2,
+        devnet: 3,
+        // Add other Sui networks as needed
+      };
+
+      // Ensure chainId is a number
+      let chainId: number;
+
+      if (
+        walletType === WalletType.REOWN_SOL &&
+        typeof currentChainId === "string"
+      ) {
+        // Use the mapping for Solana networks
+        chainId = solanaNetworkMap[currentChainId] || 101; // Default to 101 if unknown
+      } else if (
+        walletType === WalletType.SUIET_SUI &&
+        typeof currentChainId === "string"
+      ) {
+        // Use the mapping for Sui networks
+        chainId = suiNetworkMap[currentChainId] || 1; // Default to 1 (mainnet) if unknown
+      } else if (currentChainId !== undefined) {
+        // For EVM chains, parse normally
+        chainId =
+          typeof currentChainId === "string"
+            ? parseInt(currentChainId, 10)
+            : currentChainId;
       } else {
-        // Account was switched
-        store.updateWalletAddress(WalletType.METAMASK, newAccounts[0]);
+        // Fallbacks based on wallet type
+        if (walletType === WalletType.REOWN_SOL) {
+          chainId = 101; // Default Solana mainnet
+        } else if (walletType === WalletType.SUIET_SUI) {
+          chainId = 1; // Default Sui mainnet
+        } else {
+          chainId = 1; // Default Ethereum mainnet
+        }
       }
-    });
 
-    // Set up chain change listener
-    window.ethereum.on("chainChanged", (chainId: unknown) => {
+      // Create wallet info object for our store
+      const walletInfo: WalletInfo = {
+        type: walletType,
+        name: walletName,
+        address,
+        chainId,
+      };
+
+      // Update our app's store
       const store = useWeb3Store.getState();
-      store.updateWalletChainId(
-        WalletType.METAMASK,
-        parseInt(chainId as string, 16),
+      store.addWallet(walletInfo);
+
+      console.log(
+        `${walletType} wallet connected and synced with store:`,
+        walletInfo,
       );
+    },
+    [],
+  );
+
+  // Update connected namespaces state when accounts change
+  useEffect(() => {
+    setConnectedNamespaces({
+      evm: evmAccount.isConnected,
+      solana: solanaAccount.isConnected,
+      sui: suiConnected,
     });
+  }, [evmAccount.isConnected, solanaAccount.isConnected, suiConnected]);
 
-    // Set up disconnect listener
-    window.ethereum.on("disconnect", () => {
+  // Effect to sync EVM wallet state with our app's store
+  useEffect(() => {
+    if (evmAccount.isConnected && evmAccount.address) {
+      syncWalletToStore(
+        WalletType.REOWN_EVM,
+        evmAccount.address,
+        evmWalletInfo?.name || "EVM Wallet",
+        evmNetwork.chainId,
+      );
+    } else if (!evmAccount.isConnected) {
+      // Remove EVM wallet from store when disconnected
       const store = useWeb3Store.getState();
-      store.removeWallet(WalletType.METAMASK);
-    });
-
-    return walletInfo;
-  } catch (error) {
-    console.error("Error connecting to MetaMask:", error);
-    return null;
-  }
-}
-
-export async function disconnectMetamask(): Promise<void> {
-  try {
-    if (window.ethereum) {
-      // Remove all event listeners
-      window.ethereum.removeAllListeners("accountsChanged");
-      window.ethereum.removeAllListeners("chainChanged");
-      window.ethereum.removeAllListeners("disconnect");
-
-      // Update the store
-      const store = useWeb3Store.getState();
-      store.removeWallet(WalletType.METAMASK);
+      store.removeWallet(WalletType.REOWN_EVM);
     }
-  } catch (error) {
-    console.error("Error disconnecting from MetaMask:", error);
-    throw error;
-  }
-}
+  }, [
+    evmAccount.address,
+    evmAccount.isConnected,
+    evmNetwork.chainId,
+    evmWalletInfo,
+    syncWalletToStore,
+  ]);
 
-// used to display truncated wallet address
-export const truncateAddress = (address: string) => {
-  if (!address) return "";
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-};
+  // Effect to sync Solana wallet state with our app's store
+  useEffect(() => {
+    if (solanaAccount.isConnected && solanaAccount.address) {
+      syncWalletToStore(
+        WalletType.REOWN_SOL,
+        solanaAccount.address,
+        solanaWalletInfo?.name || "Solana Wallet",
+        solanaNetwork.chainId,
+      );
+    } else if (!solanaAccount.isConnected) {
+      // Remove Solana wallet from store when disconnected
+      const store = useWeb3Store.getState();
+      store.removeWallet(WalletType.REOWN_SOL);
+    }
+  }, [
+    solanaAccount.address,
+    solanaAccount.isConnected,
+    solanaNetwork.chainId,
+    solanaWalletInfo,
+    syncWalletToStore,
+  ]);
 
-/**
- * Ensures the user's wallet is connected to the correct chain
- * Prompts the user to switch if necessary
- *
- * @param targetChain The chain we want to ensure is selected in the wallet
- * @returns Promise resolving to true if the chain is correct, or false if there was an error
- */
-export async function ensureCorrectChain(targetChain: Chain): Promise<boolean> {
-  const store = useWeb3Store.getState();
-  const activeWallet = store.activeWallet;
+  // NEW: Effect to sync Sui wallet state with our app's store
+  useEffect(() => {
+    if (suiConnected && suiAddress) {
+      syncWalletToStore(
+        WalletType.SUIET_SUI,
+        suiAddress,
+        suiWalletName || "Sui Wallet",
+        1, // Default to Sui mainnet chainId
+      );
+    } else if (!suiConnected) {
+      // Remove Sui wallet from store when disconnected
+      const store = useWeb3Store.getState();
+      store.removeWallet(WalletType.SUIET_SUI);
+    }
+  }, [suiConnected, suiAddress, suiWalletName, syncWalletToStore]);
 
-  if (!activeWallet) {
-    console.error("No wallet connected");
-    return false;
-  }
+  /**
+   * Connect to a wallet via Reown AppKit or Suiet
+   * @param walletType Specific wallet type to connect to
+   */
+  const connectWallet = useCallback(
+    (walletType?: "metamask" | "phantom" | "walletConnect" | "sui") => {
+      setConnecting(true);
+      setError(null);
 
-  // Check if we're already on the correct chain
-  if (activeWallet.chainId === targetChain.chainId) {
-    return true;
-  }
-
-  // We need to switch chains
-  console.log(
-    `Switching from chain ${activeWallet.chainId} to ${targetChain.chainId}`,
-  );
-
-  // Handle different wallet types
-  if (activeWallet.type === WalletType.METAMASK) {
-    return switchMetamaskChain(targetChain);
-  }
-
-  // Add support for other wallet types here as needed
-
-  // Default fallback - we don't know how to switch this wallet type
-  console.error(
-    `Unsupported wallet type for chain switching: ${activeWallet.type}`,
-  );
-  return false;
-}
-
-/**
- * Prompts the user to switch chains in MetaMask
- *
- * @param targetChain The chain to switch to
- * @returns Promise resolving to true if successful, false otherwise
- */
-async function switchMetamaskChain(targetChain: Chain): Promise<boolean> {
-  if (!window.ethereum) {
-    console.error("MetaMask not installed");
-    return false;
-  }
-
-  try {
-    const chainIdHex = `0x${targetChain.chainId.toString(16)}`;
-
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: chainIdHex }],
-    });
-
-    return true;
-  } catch (error: unknown) {
-    // Type guard to check if error is an object with a code property
-    if (typeof error === "object" && error !== null && "code" in error) {
-      const ethError = error as { code: number };
-
-      // Error code 4902 means the chain isn't added to MetaMask yet
-      if (ethError.code === 4902) {
-        return addChainToMetamask(targetChain);
+      try {
+        if (walletType === "phantom") {
+          // Open the Solana-specific connection modal
+          open({ view: "Connect", namespace: "solana" });
+        } else if (walletType === "metamask") {
+          // Open the EVM-specific connection modal
+          open({ view: "Connect", namespace: "eip155" });
+        } else if (walletType === "walletConnect") {
+          // For WalletConnect, just open the standard view
+          open({ view: "Connect" });
+        } else if (walletType === "sui") {
+          // For Sui, we would trigger the Suiet wallet connection
+          // This would typically happen through the CustomSuiConnectButton
+          // Find and click the hidden button
+          const suiButton = document.querySelector("[data-sui-wallet-button]");
+          if (suiButton && suiButton instanceof HTMLButtonElement) {
+            suiButton.click();
+          } else {
+            throw new Error(
+              "Could not find Sui wallet button to trigger connection",
+            );
+          }
+        } else {
+          // Open the general connect modal
+          open({ view: "Connect" });
+        }
+      } catch (error) {
+        console.error("Error initiating wallet connection:", error);
+        setError(
+          typeof error === "string" ? error : "Failed to connect wallet",
+        );
+      } finally {
+        setConnecting(false);
       }
-    }
+    },
+    [open],
+  );
 
-    console.error("Error switching chain:", error);
-    return false;
-  }
-}
-
-/**
- * Adds a new chain to MetaMask if it doesn't exist
- *
- * @param chain The chain to add to MetaMask
- * @returns Promise resolving to true if successful, false otherwise
- */
-async function addChainToMetamask(chain: Chain): Promise<boolean> {
-  if (!window.ethereum) {
-    console.error("MetaMask not installed");
-    return false;
-  }
-
-  try {
-    // Format chain parameters for MetaMask
-    const params = {
-      chainId: `0x${chain.chainId.toString(16)}`,
-      chainName: chain.chainName,
-      nativeCurrency: {
-        name: chain.currency,
-        symbol: chain.symbol,
-        decimals: chain.decimals,
-      },
-      rpcUrls: [chain.rpcUrl],
-      blockExplorerUrls: [chain.explorerUrl],
-    };
-
-    // Request to add the chain
-    await window.ethereum.request({
-      method: "wallet_addEthereumChain",
-      params: [params],
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Error adding chain to MetaMask:", error);
-    return false;
-  }
-}
-
-/**
- * Convenience function to ensure the user's wallet is on the source chain
- * before performing a swap or bridge transaction
- *
- * @returns Promise resolving to true if the wallet is on the source chain
- */
-export async function ensureSourceChain(): Promise<boolean> {
-  const store = useWeb3Store.getState();
-  return ensureCorrectChain(store.sourceChain);
-}
-
-interface ChainSwitchState {
-  isLoading: boolean;
-  error: string | null;
   /**
-   * Ensure the user's wallet is connected to the source chain
-   * @returns true if the wallet is connected to the source chain after the function call
+   * Disconnect the specified wallet type
+   * @param walletType The type of wallet to disconnect, defaults to both
    */
-  switchToSourceChain: () => Promise<boolean>;
+  // Use a single disconnect function with proper namespace parameter
+  const { disconnect } = useDisconnect();
+
   /**
-   * Ensure the user's wallet is connected to a specific chain
-   * @param chain The chain to connect to
-   * @returns true if the wallet is connected to the specified chain after the function call
+   * Disconnect the specified wallet type
+   * @param walletType The type of wallet to disconnect, defaults to all wallets if not specified
    */
-  switchToChain: (chain: Chain) => Promise<boolean>;
+  const disconnectWallet = useCallback(
+    async (walletType?: WalletType) => {
+      try {
+        const store = useWeb3Store.getState();
+
+        // If no specific wallet type is provided, disconnect all wallets
+        if (walletType === undefined) {
+          console.log("Disconnecting ALL wallets");
+
+          // Disconnect EVM wallet if connected
+          if (evmAccount.isConnected) {
+            await disconnect({ namespace: "eip155" });
+            console.log("EVM wallet disconnected");
+          }
+
+          // Disconnect Solana wallet if connected
+          if (solanaAccount.isConnected) {
+            await disconnect({ namespace: "solana" });
+            console.log("Solana wallet disconnected");
+          }
+
+          // Disconnect Sui wallet if connected
+          if (suiConnected) {
+            await disconnectSui();
+            console.log("Sui wallet disconnected");
+          }
+
+          // Clear all wallets from store
+          store.disconnectAll();
+          return true;
+        }
+
+        // Disconnect a specific wallet type
+        console.log(`Disconnecting specific wallet type: ${walletType}`);
+
+        if (walletType === WalletType.REOWN_EVM && evmAccount.isConnected) {
+          // Pass the namespace "eip155" for EVM wallets
+          await disconnect({ namespace: "eip155" });
+          store.removeWallet(WalletType.REOWN_EVM);
+          console.log("EVM wallet disconnected");
+        }
+
+        if (walletType === WalletType.REOWN_SOL && solanaAccount.isConnected) {
+          // Pass the namespace "solana" for Solana wallets
+          await disconnect({ namespace: "solana" });
+          store.removeWallet(WalletType.REOWN_SOL);
+          console.log("Solana wallet disconnected");
+        }
+
+        // Handle SUI wallet case
+        if (walletType === WalletType.SUIET_SUI && suiConnected) {
+          await disconnectSui();
+          store.removeWallet(WalletType.SUIET_SUI);
+          console.log("SUI wallet disconnected");
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error disconnecting wallet:", error);
+        throw error;
+      }
+    },
+    [
+      disconnect,
+      evmAccount.isConnected,
+      solanaAccount.isConnected,
+      suiConnected,
+      disconnectSui,
+    ],
+  );
+
+  /**
+   * Check if a specific wallet type is connected
+   */
+  const isWalletTypeConnected = useCallback(
+    (walletType: WalletType) => {
+      if (walletType === WalletType.REOWN_EVM) {
+        return evmAccount.isConnected;
+      } else if (walletType === WalletType.REOWN_SOL) {
+        return solanaAccount.isConnected;
+      } else if (walletType === WalletType.SUIET_SUI) {
+        return suiConnected;
+      }
+      return false;
+    },
+    [evmAccount.isConnected, solanaAccount.isConnected, suiConnected],
+  );
+
+  /**
+   * Checks if the connected wallet is MetaMask (based on wallet name)
+   */
+  const isMetaMask = useCallback(() => {
+    if (!evmWalletInfo || !evmWalletInfo.name) return false;
+    return evmWalletInfo.name.toLowerCase().includes("metamask");
+  }, [evmWalletInfo]);
+
+  /**
+   * Checks if the connected wallet is Phantom (based on wallet name)
+   */
+  const isPhantom = useCallback(() => {
+    if (!solanaWalletInfo || !solanaWalletInfo.name) return false;
+    return solanaWalletInfo.name.toLowerCase().includes("phantom");
+  }, [solanaWalletInfo]);
+
+  /**
+   * Checks if the connected wallet is a Sui wallet (Suiet, etc.)
+   */
+  const isSuiWallet = useCallback(() => {
+    return suiConnected && !!suiAddress;
+  }, [suiConnected, suiAddress]);
+
+  return {
+    // Connection state
+    evmAccount,
+    solanaAccount,
+    suiConnected,
+    suiAddress,
+    connecting,
+    error,
+
+    // Connected states
+    isEvmConnected: evmAccount.isConnected,
+    isSolanaConnected: solanaAccount.isConnected,
+    isSuiConnected: suiConnected,
+    connectedNamespaces,
+
+    // Wallet info
+    evmWalletInfo,
+    solanaWalletInfo,
+    suiWalletName,
+    isMetaMask: isMetaMask(),
+    isPhantom: isPhantom(),
+    isSuiWallet: isSuiWallet(),
+
+    // Network/chain info
+    evmNetwork,
+    solanaNetwork,
+
+    // Actions
+    connectWallet,
+    disconnectWallet,
+    isWalletTypeConnected,
+    openModal: open,
+    closeModal: close,
+  };
 }
 
 /**
- * Hook for managing chain switching functionality in the UI
- * Uses state for tracking loading/error status and handles chain switching logic
+ * Enhanced hook for managing chain switching functionality in the UI
+ * Uses Reown AppKit's network functions
+ * Supports both EVM and Solana chains
  */
-export function useChainSwitch(): ChainSwitchState {
+export function useChainSwitch() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const activeWallet = useWeb3Store((state) => state.activeWallet);
+  // Get the wallet connection hook for access to both wallet types
+  const { evmNetwork, solanaNetwork } = useWalletConnection();
 
-  /**
-   * Switch to a specific chain
-   * @param chain The chain to switch to
-   */
   const switchToChain = async (chain: Chain): Promise<boolean> => {
     setError(null);
-
-    // Check if wallet is connected
-    if (!activeWallet) {
-      const errorMsg = "No wallet connected. Please connect your wallet first.";
-      setError(errorMsg);
-      return false;
-    }
 
     try {
       setIsLoading(true);
 
-      // Import dynamically to avoid server-side rendering issues
-      const { ensureCorrectChain } = await import("@/utils/walletMethods");
-      const success = await ensureCorrectChain(chain);
-
-      if (!success) {
-        const errorMsg = `Failed to switch to ${chain.name} network. Please try manually switching in your wallet.`;
-        setError(errorMsg);
+      // For Sui wallets, just update the store with the chain ID
+      if (chain.walletType === WalletType.SUIET_SUI) {
+        return true;
       }
 
-      return success;
+      // For EVM and Solana wallets, proceed with regular network switching
+      const isSolanaChain = chain.walletType === WalletType.REOWN_SOL;
+      const isEvmChain = chain.walletType === WalletType.REOWN_EVM;
+      const namespace = isSolanaChain ? "solana" : "eip155";
+
+      // Create properly typed CAIP network ID
+      const caipNetworkId = createCaipNetworkId(
+        namespace as "eip155" | "solana" | "bip122" | "polkadot",
+        chain.chainId,
+      );
+
+      // Create a proper Reown network definition
+      const reownNetwork = defineChain({
+        id: chain.chainId,
+        caipNetworkId: caipNetworkId,
+        chainNamespace: namespace as ChainNamespace,
+        name: chain.name,
+        nativeCurrency: {
+          decimals: chain.decimals,
+          name: chain.currency,
+          symbol: chain.symbol,
+        },
+        rpcUrls: {
+          default: {
+            http: [chain.rpcUrl || ""],
+          },
+        },
+        blockExplorers: chain.explorerUrl
+          ? {
+              default: {
+                name: chain.name,
+                url: chain.explorerUrl,
+              },
+            }
+          : undefined,
+      });
+
+      // Use the appropriate network switcher
+      if (isSolanaChain) {
+        await solanaNetwork.switchNetwork(reownNetwork);
+      } else if (isEvmChain) {
+        await evmNetwork.switchNetwork(reownNetwork);
+      }
+
+      return true;
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "An unknown error occurred";
@@ -304,51 +513,11 @@ export function useChainSwitch(): ChainSwitchState {
   const switchToSourceChain = async (): Promise<boolean> => {
     setError(null);
 
-    if (!activeWallet) {
-      const errorMsg = "No wallet connected. Please connect your wallet first.";
-      setError(errorMsg);
-      return false;
-    }
-
-    // Get current chain ID directly from MetaMask
-    if (window.ethereum) {
-      try {
-        const chainIdHex = await window.ethereum.request<string>({
-          method: "eth_chainId",
-        });
-        const currentChainId = parseInt(chainIdHex as string, 16);
-        const sourceChain = useWeb3Store.getState().sourceChain;
-
-        console.log("Hook - Current MetaMask chainId:", currentChainId);
-        console.log("Hook - Source chain ID:", sourceChain.chainId);
-
-        // If already on the correct chain, no need to switch
-        if (currentChainId === sourceChain.chainId) {
-          return true;
-        }
-
-        // Ensure store is synced with current MetaMask state
-        if (activeWallet.chainId !== currentChainId) {
-          useWeb3Store
-            .getState()
-            .updateWalletChainId(activeWallet.type, currentChainId);
-        }
-      } catch (err) {
-        console.error("Error checking MetaMask chain:", err);
-      }
-    }
-
     try {
       setIsLoading(true);
-      const success = await ensureSourceChain();
+      const sourceChain = useWeb3Store.getState().sourceChain;
 
-      if (!success) {
-        const sourceChain = useWeb3Store.getState().sourceChain;
-        const errorMsg = `Failed to switch to ${sourceChain.name} network. Please try manually switching in your wallet.`;
-        setError(errorMsg);
-      }
-
-      return success;
+      return await switchToChain(sourceChain);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "An unknown error occurred";
@@ -359,13 +528,48 @@ export function useChainSwitch(): ChainSwitchState {
       setIsLoading(false);
     }
   };
-
   return {
     isLoading,
     error,
     switchToSourceChain,
     switchToChain,
   };
+}
+/**
+ * Ensures the correct wallet type is active for the given chain
+ * Automatically switches active wallet if needed and possible
+ *
+ * @param targetChain The chain we want to use
+ * @returns True if the correct wallet type is active or was switched to, false otherwise
+ */
+export function ensureCorrectWalletTypeForChain(sourceChain: Chain): boolean {
+  const store = useWeb3Store.getState();
+  const requiredWallet = store.getWalletByType(sourceChain.walletType);
+  const connectedWallets = store.connectedWallets;
+
+  const neededWalletType = sourceChain.walletType;
+
+  // If active wallet is already the correct type, return true
+  if (requiredWallet?.type === neededWalletType) {
+    return true;
+  }
+
+  // Check if we have a connected wallet of the needed type
+  const compatibleWallet = connectedWallets.find(
+    (w) => w.type === neededWalletType,
+  );
+
+  if (compatibleWallet) {
+    // Switch to the compatible wallet
+    console.log(`${neededWalletType} wallet found`);
+    return true;
+  }
+
+  // No compatible wallet connected
+  console.error(
+    `No connected ${neededWalletType} wallet available for ${sourceChain.name}`,
+  );
+  return false;
 }
 
 interface TokenTransferOptions {
@@ -390,7 +594,7 @@ interface TokenTransferState {
   isValid: boolean;
   isButtonDisabled: boolean;
 
-  activeWallet: WalletInfo | null;
+  isWalletCompatible: boolean;
   sourceChain: Chain;
   destinationChain: Chain;
   sourceToken: Token | null;
@@ -432,6 +636,7 @@ export function useTokenTransfer(
     number | null
   >(null);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+  const [isWalletCompatible, setIsWalletCompatible] = useState<boolean>(true);
 
   // Add state for fee information
   const [protocolFeeBps, setProtocolFeeBps] = useState<number | null>(null);
@@ -440,7 +645,10 @@ export function useTokenTransfer(
   const [totalFeeUsd, setTotalFeeUsd] = useState<number | null>(null);
 
   // Get relevant state from the web3 store
-  const activeWallet = useWeb3Store((state) => state.activeWallet);
+  const requiredWallet = useWeb3Store((state) =>
+    state.getWalletBySourceChain(),
+  );
+
   const sourceChain = useWeb3Store((state) => state.sourceChain);
   const destinationChain = useWeb3Store((state) => state.destinationChain);
   const sourceToken = useWeb3Store((state) => state.sourceToken);
@@ -451,7 +659,24 @@ export function useTokenTransfer(
     (state) => state.transactionDetails.receiveAddress,
   );
 
+  // Get wallet providers and signers
+  const { getEvmSigner, getSolanaSigner } = useWalletProviderAndSigner();
+
   const latestRequestIdRef = useRef<number>(0);
+
+  // Determine if source chain requires Solana or Sui
+  const wallet = useWallet();
+
+  // HOOK CHECK: Check wallet compatibility when source chain changes
+  useEffect(() => {
+    if (!requiredWallet) {
+      setIsWalletCompatible(true);
+      return;
+    }
+
+    const walletCompatible = ensureCorrectWalletTypeForChain(sourceChain);
+    setIsWalletCompatible(walletCompatible);
+  }, [requiredWallet, sourceChain]);
 
   const failQuote = () => {
     setQuoteData(null);
@@ -508,7 +733,8 @@ export function useTokenTransfer(
   const isValid: boolean =
     options.type === "swap" ? isValidForSwap : isValidForBridge;
 
-  const isButtonDisabled: boolean = !isValid || isProcessing;
+  const isButtonDisabled: boolean =
+    !isValid || isProcessing || !isWalletCompatible;
 
   // Update this useEffect to include fee calculation
   useEffect(() => {
@@ -568,12 +794,16 @@ export function useTokenTransfer(
             referrerBps,
           });
         } else if (options.type === "bridge" && sourceToken) {
-          quotes = await getMayanBridgeQuote({
+          quotes = await getMayanQuote({
             amount,
             sourceToken,
+            destinationToken: sourceToken, // Same token on destination chain
             sourceChain,
             destinationChain,
             slippageBps,
+            gasDrop,
+            referrer,
+            referrerBps,
           });
         }
 
@@ -675,7 +905,6 @@ export function useTokenTransfer(
           failQuote();
         }
       } catch (error: unknown) {
-        // Error handling code unchanged...
         // Check if this is still the latest request
         if (currentRequestId !== latestRequestIdRef.current) {
           return; // Ignore errors from stale requests
@@ -771,6 +1000,16 @@ export function useTokenTransfer(
       return;
     }
 
+    // Check if wallet is compatible with source chain
+    if (!isWalletCompatible) {
+      const requiredWalletType = sourceChain.walletType;
+
+      toast.error(`${requiredWalletType} wallet required`, {
+        description: `Please connect a ${requiredWalletType} wallet to continue`,
+      });
+      return;
+    }
+
     // Generate a toast ID that we'll use for both success and error cases
     const toastId = toast.loading(
       `${options.type === "swap" ? "Swapping" : "Bridging"} ${amount} ${sourceToken!.ticker}...`,
@@ -798,41 +1037,111 @@ export function useTokenTransfer(
       const referrer = "9tks3cKdFxDwBPiyoYy9Wi4gQ29T9Qizniq7kDW86kNh";
       const referrerBps = 50;
 
-      if (options.type === "swap" && sourceToken && destinationToken) {
-        quotes = await getMayanQuote({
+      // Refresh quote if needed
+      if (!quoteData || quoteData.length === 0) {
+        // Fetch fresh quote
+        if (options.type === "swap" && sourceToken && destinationToken) {
+          quotes = await getMayanQuote({
+            amount,
+            sourceToken,
+            destinationToken,
+            sourceChain,
+            destinationChain,
+            slippageBps,
+            gasDrop,
+            referrer,
+            referrerBps,
+          });
+        } else if (options.type === "bridge" && sourceToken) {
+          quotes = await getMayanQuote({
+            amount,
+            sourceToken,
+            destinationToken: sourceToken, // Same token on destination
+            sourceChain,
+            destinationChain,
+            slippageBps,
+            gasDrop,
+            referrer,
+            referrerBps,
+          });
+        }
+
+        setQuoteData(quotes);
+      } else {
+        // Use existing quote
+        quotes = quoteData;
+      }
+
+      if (!quotes || quotes.length === 0) {
+        throw new Error("Could not obtain a valid quote");
+      }
+
+      let result: string;
+
+      // Execute the appropriate swap based on wallet type
+      if (sourceChain.walletType === WalletType.REOWN_SOL) {
+        // Get Solana signer
+        const solanaSigner = await getSolanaSigner();
+        const connection = new Connection(
+          `https://solana-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+          "confirmed",
+        );
+        // Execute Solana swap
+        result = await executeSolanaSwap({
+          quote: quotes[0],
+          swapperAddress: requiredWallet!.address,
+          destinationAddress: receiveAddress || requiredWallet!.address,
+          sourceToken: sourceToken!.address,
           amount,
-          sourceToken,
-          destinationToken,
-          sourceChain,
-          destinationChain,
-          slippageBps,
-          gasDrop,
-          referrer,
-          referrerBps,
+          referrerAddresses: {
+            solana: "9tks3cKdFxDwBPiyoYy9Wi4gQ29T9Qizniq7kDW86kNh",
+            evm: "0x95C0029426afa8E47a71b8E6b251f5B70511e599",
+            sui: "0xc232b25bd8796b2b1c8797f66f732fd22aa01db65102fe9f22f76b51af78476e",
+          },
+          solanaSigner: solanaSigner as SolanaSigner,
+          connection: connection,
+        });
+      } else if (sourceChain.walletType === WalletType.SUIET_SUI) {
+        // Get Sui signer
+        if (!wallet || !wallet.signAndExecuteTransaction) {
+          throw new Error(
+            "Sui wallet not connected or doesn't support signAndExecuteTransaction",
+          );
+        }
+        result = await executeSuiSwap({
+          quote: quotes[0],
+          swapperAddress: requiredWallet!.address,
+          destinationAddress: receiveAddress || requiredWallet!.address,
+          referrerAddresses: {
+            solana: "9tks3cKdFxDwBPiyoYy9Wi4gQ29T9Qizniq7kDW86kNh",
+            evm: "0x95C0029426afa8E47a71b8E6b251f5B70511e599",
+            sui: "0xc232b25bd8796b2b1c8797f66f732fd22aa01db65102fe9f22f76b51af78476e",
+          },
+          signTransaction: wallet.signTransaction,
+        });
+      } else {
+        // Get EVM signer
+        const evmSigner = await getEvmSigner();
+
+        // Execute EVM swap
+        result = await executeEvmSwap({
+          quote: quotes[0],
+          swapperAddress: requiredWallet!.address,
+          destinationAddress: receiveAddress || requiredWallet!.address,
+          sourceToken: sourceToken!.address,
+          amount,
+          referrerAddresses: {
+            solana: "9tks3cKdFxDwBPiyoYy9Wi4gQ29T9Qizniq7kDW86kNh",
+          },
+          signer: evmSigner,
+          tokenDecimals: sourceToken!.decimals || 18,
         });
       }
 
-      setQuoteData(quotes);
-
-      // Get provider and signer
-      const provider = getEthersProvider();
-      const signer = await provider.getSigner();
-
-      // Execute the swap with permit
-      const result = await executeEvmSwap({
-        quote: quoteData![0],
-        swapperAddress: activeWallet!.address,
-        destinationAddress: receiveAddress || activeWallet!.address, // Usually same as swapper
-        sourceToken: sourceToken!.address,
-        amount: amount,
-        referrerAddresses: {
-          solana: "9tks3cKdFxDwBPiyoYy9Wi4gQ29T9Qizniq7kDW86kNh",
-        },
-        signer,
-        tokenDecimals: sourceToken!.decimals || 18,
-      });
-
-      console.log("Swap initiated:", result);
+      console.log(
+        `${sourceChain.walletType === WalletType.REOWN_SOL ? "Solana" : sourceChain.walletType === WalletType.SUIET_SUI ? "Sui" : "EVM"} swap initiated:`,
+        result,
+      );
 
       toast.success(
         `${options.type === "swap" ? "Swap" : "Bridge"} completed successfully`,
@@ -884,7 +1193,6 @@ export function useTokenTransfer(
     isLoadingQuote,
 
     // Store state
-    activeWallet,
     sourceChain,
     destinationChain,
     sourceToken,
@@ -897,34 +1205,13 @@ export function useTokenTransfer(
     relayerFeeUsd,
     totalFeeUsd,
 
+    // Wallet compatibility
+    isWalletCompatible,
+
     // Actions
     handleTransfer,
   };
 }
-
-export async function getMayanBridgeQuote({
-  amount,
-  sourceToken,
-  sourceChain,
-  destinationChain,
-  slippageBps = "auto", // Default to 'auto' slippage
-}: {
-  amount: string;
-  sourceToken: Token;
-  sourceChain: Chain;
-  destinationChain: Chain;
-  slippageBps?: "auto" | number;
-}): Promise<Quote[]> {
-  return getMayanQuote({
-    amount,
-    sourceToken,
-    destinationToken: sourceToken, // Same token on both chains
-    sourceChain,
-    destinationChain,
-    slippageBps, // Pass through the slippage parameter
-  });
-}
-
 /**
  * Extract a user-friendly error message from blockchain errors
  */
@@ -1004,3 +1291,8 @@ export function parseSwapError(error: unknown): string {
     return friendlyMessage;
   }
 }
+
+export const truncateAddress = (address: string) => {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};

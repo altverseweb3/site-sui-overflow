@@ -1,3 +1,7 @@
+// types/web3.ts
+
+import { Transaction, VersionedTransaction } from "@solana/web3.js";
+
 export interface WalletInfo {
   type: WalletType; // Static Enum to type/identify the wallet
   name: string; // human-readable name of the wallet e.g. "MetaMask"
@@ -7,9 +11,9 @@ export interface WalletInfo {
 }
 
 export enum WalletType {
-  METAMASK = "METAMASK",
-  COINBASE = "COINBASE",
-  WALLET_CONNECT = "WALLET_CONNECT",
+  REOWN_EVM = "REOWN_EVM",
+  REOWN_SOL = "REOWN_SOL",
+  SUIET_SUI = "SUIET_SUI",
 }
 
 export type MayanChainName =
@@ -61,12 +65,12 @@ export type Chain = {
   l2: boolean;
   gasDrop: number;
   nativeAddress?: string;
+  walletType: WalletType;
 };
 
 export interface Web3StoreState {
   // Wallet-related state
   connectedWallets: Array<Omit<WalletInfo, "provider">>;
-  activeWallet: Omit<WalletInfo, "provider"> | null;
 
   // Chain selection state
   sourceChain: Chain;
@@ -97,7 +101,6 @@ export interface Web3StoreState {
   // Wallet actions
   addWallet: (wallet: WalletInfo) => void;
   removeWallet: (walletType: WalletType) => void;
-  setActiveWallet: (walletType: WalletType) => void;
   updateWalletAddress: (walletType: WalletType, address: string) => void;
   updateWalletChainId: (walletType: WalletType, chainId: number) => void;
   disconnectAll: () => void;
@@ -110,7 +113,6 @@ export interface Web3StoreState {
   // Token selection actions - new additions
   setSourceToken: (token: Token | null) => void;
   setDestinationToken: (token: Token | null) => void;
-  swapTokens: () => void;
   addCustomToken: (token: Token) => void;
 
   // Token data actions
@@ -129,6 +131,12 @@ export interface Web3StoreState {
   ) => void;
   updateTokenPrices: (priceResults: TokenPriceResult[]) => void;
   setTokensLoading: (loading: boolean) => void;
+
+  getWalletsOfType: (walletType: WalletType) => WalletInfo[];
+  isWalletTypeConnected: (walletType: WalletType) => boolean;
+  getWalletByType: (walletType: WalletType) => WalletInfo | null;
+  getWalletBySourceChain: () => WalletInfo | null;
+  getWalletByDestinationChain: () => WalletInfo | null;
 }
 
 export enum Network {
@@ -218,6 +226,7 @@ export enum Network {
   DEGEN_MAINNET = "degen-mainnet",
   INK_MAINNET = "ink-mainnet",
   INK_SEPOLIA = "ink-sepolia",
+  SOLANA_MAINNET = "solana-mainnet",
 }
 
 export interface TokenBalance {
@@ -249,4 +258,79 @@ export interface TokenPriceResult {
   address: string;
   prices: TokenPrice[];
   error: string | null;
+}
+
+// you can thank our linting for this...
+type EthereumMethod =
+  | "eth_chainId"
+  | "eth_accounts"
+  | "eth_requestAccounts"
+  | "eth_sendTransaction"
+  | "eth_sign"
+  | "eth_signTransaction"
+  | "eth_signTypedData"
+  | "eth_signTypedData_v4"
+  | "wallet_switchEthereumChain"
+  | "wallet_addEthereumChain"
+  | "personal_sign"
+  | "net_version"
+  | "eth_getBalance"
+  | string;
+
+type EthereumParam =
+  | string
+  | number
+  | boolean
+  | null
+  | Array<string | number | boolean | null | Record<string, unknown>>
+  | Record<string, unknown>;
+
+type EthereumResult =
+  | string
+  | string[]
+  | boolean
+  | number
+  | Record<string, unknown>
+  | null;
+
+export interface Eip1193Provider {
+  request(args: {
+    method: EthereumMethod;
+    params?: EthereumParam[];
+  }): Promise<EthereumResult>;
+}
+
+export type ChainNamespace = "eip155" | "solana" | "polkadot" | "bip122";
+
+export interface SolanaSigner {
+  publicKey: string;
+  signTransaction: (
+    transaction: Transaction | VersionedTransaction,
+  ) => Promise<Transaction | VersionedTransaction>;
+  signAllTransactions?: (
+    transactions: (Transaction | VersionedTransaction)[],
+  ) => Promise<(Transaction | VersionedTransaction)[]>;
+  signMessage?: (message: Uint8Array) => Promise<{ signature: Uint8Array }>;
+}
+
+export interface SolanaTokenBalance {
+  pubkey: string;
+  mint: string;
+  owner: string;
+  amount: string;
+  decimals: number;
+  uiAmount: number;
+  uiAmountString: string;
+  isNative?: boolean;
+}
+
+// Extended TokenBalance for Solana compatibility
+export interface EnhancedTokenBalance extends TokenBalance {
+  decimals?: number;
+  uiAmount?: number;
+  uiAmountString?: string;
+  pubkey?: string;
+  owner?: string;
+  isNative?: boolean;
+  rawAmount?: string;
 }

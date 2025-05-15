@@ -1,14 +1,17 @@
 // src/utils/tokenApiMethods.ts
-import { evmTokenApi } from "@/api/evmTokenApi";
+import { tokenApi, ApiResponse } from "@/api/tokenApi";
 import { getChainByChainId } from "@/config/chains";
 import useWeb3Store from "@/store/web3Store";
 import {
   Token,
   TokenAddressInfo,
-  TokenBalance,
   TokenPriceResult,
   TokenMetadata,
+  SolanaTokenBalance,
+  EnhancedTokenBalance,
+  TokenBalance,
 } from "@/types/web3";
+import { SuiBalanceResult } from "@/api/tokenApi";
 
 /**
  * Formats a balance from hex or large number string to a human-readable token amount
@@ -54,7 +57,8 @@ function formatTokenBalance(balanceStr: string, decimals: number): string {
 
 export async function getPricesAndBalances(): Promise<boolean> {
   const store = useWeb3Store.getState();
-  const activeWallet = store.activeWallet;
+  const sourceWallet = store.getWalletBySourceChain();
+  const destinationWallet = store.getWalletByDestinationChain();
 
   store.setTokensLoading(true);
 
@@ -62,12 +66,12 @@ export async function getPricesAndBalances(): Promise<boolean> {
     const [sourceResult, destinationResult] = await Promise.allSettled([
       getPricesAndBalancesForChain(
         store.sourceChain.chainId,
-        activeWallet?.address,
+        sourceWallet?.address,
         "source",
       ),
       getPricesAndBalancesForChain(
         store.destinationChain.chainId,
-        activeWallet?.address,
+        destinationWallet?.address,
         "destination",
       ),
     ]);
@@ -112,17 +116,37 @@ export async function getPricesAndBalancesForChain(
 
     // 2. Fetch Balances only if userAddress is provided
     let addressesWithBalance: string[] = [];
-    let balanceData: TokenBalance[] | null = null;
+    let balanceData: EnhancedTokenBalance[] | null = null;
 
     if (userAddress) {
       try {
         console.log(
           `Fetching balances for address ${userAddress} on ${chainType} chain (${networkName})`,
         );
-        const balanceResponse = await evmTokenApi.getBalances({
-          network: networkName,
-          userAddress,
-        });
+
+        let balanceResponse:
+          | ApiResponse<SuiBalanceResult[]>
+          | ApiResponse<SolanaTokenBalance[]>
+          | ApiResponse<TokenBalance[]>;
+
+        if (chain.id === "sui") {
+          // Handle Sui balances
+          balanceResponse = await tokenApi.getSuiBalances({
+            owner: userAddress,
+          });
+        } else if (chain.id === "solana") {
+          // Handle Solana SPL balances
+          balanceResponse = await tokenApi.getSplBalances({
+            network: networkName,
+            userAddress,
+          });
+        } else {
+          // Handle EVM balances
+          balanceResponse = await tokenApi.getBalances({
+            network: networkName,
+            userAddress,
+          });
+        }
 
         if (balanceResponse.error || !balanceResponse.data) {
           console.error(
@@ -131,9 +155,50 @@ export async function getPricesAndBalancesForChain(
           );
           // Update store with empty balances for this user/chain to clear old data
           useWeb3Store.getState().updateTokenBalances(chainId, userAddress, []);
-          // Continue to fetch alwaysLoadPrice tokens even if balance fetch fails
+          // Continue to fetch alwaysLoadPrice tokens even if balance fetch fails (except for Sui)
         } else {
-          balanceData = balanceResponse.data;
+          // Transform responses to match EVM format
+          if (chain.id === "sui") {
+            // Transform Sui response to match EVM format
+            // Need to format balances using token decimals since Sui returns raw amounts
+            balanceData = (balanceResponse.data as SuiBalanceResult[]).map(
+              (suiBalance) => {
+                // We'll need to format this balance later when we have token metadata
+                // For now, store the raw balance and let the processing section handle formatting
+                return {
+                  contractAddress: suiBalance.coinType, // Already normalized during token loading
+                  tokenBalance: suiBalance.totalBalance, // Keep raw balance for now
+                  // Include additional Sui-specific properties
+                  coinObjectCount: suiBalance.coinObjectCount,
+                  lockedBalance: suiBalance.lockedBalance,
+                  // Mark this as needing formatting
+                  needsFormatting: true,
+                } as EnhancedTokenBalance & { needsFormatting?: boolean };
+              },
+            );
+          } else if (chain.id === "solana") {
+            // Transform Solana SPL token response to match EVM format
+            balanceData = (balanceResponse.data as SolanaTokenBalance[]).map(
+              (splToken) => ({
+                contractAddress: splToken.mint, // mint address is the token contract for Solana
+                tokenBalance:
+                  splToken.uiAmountString ||
+                  splToken.uiAmount?.toString() ||
+                  "0", // Use already formatted amount
+                // Include additional Solana-specific properties that might be useful
+                decimals: splToken.decimals,
+                uiAmount: splToken.uiAmount,
+                uiAmountString: splToken.uiAmountString,
+                pubkey: splToken.pubkey,
+                owner: splToken.owner,
+                isNative: splToken.isNative || false,
+                // Store raw amount for reference if needed
+                rawAmount: splToken.amount,
+              }),
+            ) as EnhancedTokenBalance[];
+          } else {
+            balanceData = balanceResponse.data as EnhancedTokenBalance[];
+          }
 
           if (!balanceData || balanceData.length === 0) {
             console.log(
@@ -148,9 +213,12 @@ export async function getPricesAndBalancesForChain(
               `Found ${balanceData.length} token balances for ${userAddress} on ${chainType} chain.`,
             );
 
-            // Extract addresses with balance
-            addressesWithBalance = balanceData.map((balance) =>
-              balance.contractAddress.toLowerCase(),
+            // Extract addresses with balance - preserve case for Solana and Sui, lowercase for others
+            addressesWithBalance = balanceData.map(
+              (balance) =>
+                chain.id === "solana" || chain.id === "sui"
+                  ? balance.contractAddress // Keep original case for Solana and Sui
+                  : balance.contractAddress.toLowerCase(), // Lowercase for EVM chains
             );
           }
         }
@@ -158,7 +226,7 @@ export async function getPricesAndBalancesForChain(
         console.error(`Error fetching balances for ${chainType} chain:`, error);
         // Update store with empty balances on error
         useWeb3Store.getState().updateTokenBalances(chainId, userAddress, []);
-        // Continue to fetch alwaysLoadPrice tokens even if balance fetch fails
+        // Continue to fetch alwaysLoadPrice tokens even if balance fetch fails (except for Sui)
       }
     } else {
       console.log(
@@ -166,14 +234,46 @@ export async function getPricesAndBalancesForChain(
       );
     }
 
-    // 3. Prepare Addresses for Price Fetching
-    // Get tokens with alwaysLoadPrice
+    // 3. Skip price fetching for Sui chains
+    if (chain.id === "sui") {
+      console.log(`Skipping price fetch for Sui chain as requested.`);
+
+      // 6. Process Balances for Sui if userAddress is provided and we have balance data
+      if (userAddress && balanceData && balanceData.length > 0) {
+        // For Sui, we'll just update the balances without price calculations
+        const processedBalances = balanceData.map((balance) => ({
+          ...balance,
+          balanceUsd: undefined, // No USD value calculation for Sui
+        }));
+
+        // 7. Update Token Balances in the Store
+        useWeb3Store
+          .getState()
+          .updateTokenBalances(chainId, userAddress, processedBalances);
+        console.log(
+          `Updated ${processedBalances.length} processed token balances in the store for user ${userAddress} on ${chainType} chain ${chainId}.`,
+        );
+      }
+
+      console.log(
+        `Successfully completed fetch for ${chainType} chain (ID: ${chainId}) - Sui balances only`,
+      );
+      return true;
+    }
+
+    // 3. Prepare Addresses for Price Fetching (for non-Sui chains)
+    // Get tokens with alwaysLoadPrice - preserve case for Solana, lowercase for others
     const alwaysLoadPriceAddresses = useWeb3Store
       .getState()
       .allTokensList.filter(
         (token) => token.chainId === chainId && token.alwaysLoadPrice,
       )
-      .map((token) => token.address.toLowerCase());
+      .map(
+        (token) =>
+          chain.id === "solana"
+            ? token.address // Keep original case for Solana
+            : token.address.toLowerCase(), // Lowercase for EVM chains
+      );
 
     // Combine and deduplicate addresses
     const uniqueAddresses = [
@@ -190,7 +290,7 @@ export async function getPricesAndBalancesForChain(
     const tokenAddressesForPriceFetch: TokenAddressInfo[] = uniqueAddresses.map(
       (address) => ({
         network: networkName,
-        address: address,
+        address: address, // This preserves the original case for Solana
       }),
     );
 
@@ -211,7 +311,7 @@ export async function getPricesAndBalancesForChain(
         console.log(
           `Processing price batch ${i + 1}/${batches.length} for ${chainType} chain`,
         );
-        const response = await evmTokenApi.getTokenPrices({ addresses: batch });
+        const response = await tokenApi.getTokenPrices({ addresses: batch });
 
         if (response.error || !response.data) {
           console.error(
@@ -249,20 +349,84 @@ export async function getPricesAndBalancesForChain(
     if (userAddress && balanceData && balanceData.length > 0) {
       // Get potentially updated token info from the store (which now includes latest prices)
       const updatedTokens = useWeb3Store.getState().getTokensForChain(chainId);
+
+      // Create lookup mapping - for Solana, create both case-sensitive and case-insensitive lookups
       const tokensByAddress: Record<string, Token> = {};
       updatedTokens.forEach((token) => {
-        tokensByAddress[token.address.toLowerCase()] = token;
+        if (chain.id === "solana") {
+          // For Solana, keep both original case and lowercase for flexible lookup
+          tokensByAddress[token.address] = token;
+          tokensByAddress[token.address.toLowerCase()] = token;
+        } else {
+          // For EVM chains, use lowercase
+          tokensByAddress[token.address.toLowerCase()] = token;
+        }
       });
 
       const processedBalances = balanceData.map((balance) => {
-        const tokenAddress = balance.contractAddress.toLowerCase();
-        const token = tokensByAddress[tokenAddress]; // Get token info (includes price)
+        // For token lookup, try original case first, then lowercase as fallback
+        const tokenAddress =
+          chain.id === "solana"
+            ? balance.contractAddress
+            : balance.contractAddress.toLowerCase();
+
+        let token = tokensByAddress[tokenAddress];
+
+        // If not found and this is Solana, try the other case
+        if (!token && chain.id === "solana") {
+          token = tokensByAddress[balance.contractAddress.toLowerCase()];
+        }
+
+        // Type guard to check if balance has Solana-specific properties
+        const isSolanaBalance = (
+          bal: EnhancedTokenBalance,
+        ): bal is EnhancedTokenBalance & { isNative: boolean } => {
+          return "isNative" in bal;
+        };
+
+        // For Solana, check if this is a native SOL balance
+        if (
+          chain.id === "solana" &&
+          isSolanaBalance(balance) &&
+          balance.isNative
+        ) {
+          // Handle native SOL balance - it's already formatted
+          const formattedBalance = balance.tokenBalance; // Already formatted by API
+
+          let balanceUsd: string | undefined = undefined;
+          // For native SOL, we might need to look up the token info differently
+          // The mint address for native SOL is "11111111111111111111111111111111"
+          const nativeSolToken =
+            tokensByAddress["11111111111111111111111111111111"];
+          if (nativeSolToken && nativeSolToken.priceUsd) {
+            try {
+              const numBalance = parseFloat(formattedBalance);
+              const price =
+                typeof nativeSolToken.priceUsd === "string"
+                  ? parseFloat(nativeSolToken.priceUsd)
+                  : nativeSolToken.priceUsd;
+              if (!isNaN(numBalance) && !isNaN(price)) {
+                balanceUsd = (numBalance * price).toFixed(2);
+              }
+            } catch (e) {
+              console.error(`Error calculating USD balance for native SOL:`, e);
+            }
+          }
+
+          return {
+            ...balance,
+            tokenBalance: formattedBalance,
+            balanceUsd,
+          };
+        }
 
         if (token && token.decimals !== undefined) {
-          const formattedBalance = formatTokenBalance(
-            balance.tokenBalance,
-            token.decimals,
-          );
+          // For Solana SPL tokens, the balance is already formatted by the API
+          // For EVM tokens, we need to format them
+          const formattedBalance =
+            chain.id === "solana"
+              ? balance.tokenBalance // Already formatted by Solana API
+              : formatTokenBalance(balance.tokenBalance, token.decimals); // Format for EVM
 
           let balanceUsd: string | undefined = undefined;
           // Use the price fetched and stored in the token object
@@ -360,7 +524,7 @@ export async function getTokenMetadata(
     }
 
     // Prepare and send the request
-    const response = await evmTokenApi.getTokenMetadata({
+    const response = await tokenApi.getTokenMetadata({
       network: chain.alchemyNetworkName,
       contractAddress,
     });

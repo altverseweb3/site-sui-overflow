@@ -1,11 +1,17 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { BrandedButton } from "@/components/ui/BrandedButton";
 import { TransactionDetails } from "@/components/ui/TransactionDetails";
-import { useChainSwitch } from "@/utils/walletMethods";
+import {
+  useChainSwitch,
+  useWalletConnection,
+  ensureCorrectWalletTypeForChain,
+} from "@/utils/walletMethods";
 import useWeb3Store from "@/store/web3Store";
 import { toast } from "sonner";
 import { AvailableIconName } from "@/types/ui";
+import { WalletType } from "@/types/web3";
+import { useWallet } from "@suiet/wallet-kit";
 
 interface SwapInterfaceProps {
   children: ReactNode;
@@ -19,12 +25,12 @@ interface SwapInterfaceProps {
   protocolFeeUsd?: number;
   relayerFeeUsd?: number;
   totalFeeUsd?: number;
-  estimatedTime?: number | null; // Allow null for estimated time
+  estimatedTime?: number | null;
   enforceSourceChain?: boolean;
   renderActionButton?: () => ReactNode;
   detailsOpen?: boolean;
   onDetailsToggle?: () => void;
-  isLoadingQuote?: boolean; // Add this prop to track quote loading
+  isLoadingQuote?: boolean;
 }
 
 export function SwapInterface({
@@ -46,28 +52,49 @@ export function SwapInterface({
     switchToSourceChain,
   } = useChainSwitch();
 
+  // Get wallet connection information for EVM, Solana, and Sui
+  const { evmNetwork, isEvmConnected } = useWalletConnection();
+
+  // Get Sui wallet info directly
+  const { connected: suiConnected } = useWallet();
+
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const activeWallet = useWeb3Store((state) => state.activeWallet);
+  const requiredWallet = useWeb3Store((state) =>
+    state.getWalletBySourceChain(),
+  );
   const sourceChain = useWeb3Store((state) => state.sourceChain);
 
   const checkCurrentChain = async (): Promise<boolean> => {
-    if (!activeWallet || !window.ethereum) {
+    if (!requiredWallet) {
       return false;
     }
 
     try {
-      const chainIdHex = await window.ethereum.request<string>({
-        method: "eth_chainId",
-      });
-      const currentChainId = parseInt(chainIdHex as string, 16);
+      let currentChainId: number | undefined;
 
-      console.log("Current MetaMask chainId:", currentChainId);
+      // Check which wallet type we're using
+      if (requiredWallet.type === WalletType.REOWN_EVM) {
+        // For EVM wallets, get chain ID from the EVM network
+        if (evmNetwork.chainId !== undefined) {
+          currentChainId =
+            typeof evmNetwork.chainId === "string"
+              ? parseInt(evmNetwork.chainId, 10)
+              : evmNetwork.chainId;
+        }
+      }
+      // For Solana and Sui wallets, we only support the mainnet chain
+
+      console.log("Current chain ID:", currentChainId);
       console.log("Source chain ID:", sourceChain.chainId);
 
-      if (activeWallet.chainId !== currentChainId) {
+      // Update the store if the chain ID has changed
+      if (
+        requiredWallet.chainId !== currentChainId &&
+        currentChainId !== undefined
+      ) {
         const store = useWeb3Store.getState();
-        store.updateWalletChainId(activeWallet.type, currentChainId);
+        store.updateWalletChainId(requiredWallet.type, currentChainId);
       }
 
       return currentChainId === sourceChain.chainId;
@@ -77,7 +104,26 @@ export function SwapInterface({
     }
   };
 
-  React.useEffect(() => {
+  // Update store when chain ID changes for EVM, Solana, or Sui wallets
+  useEffect(() => {
+    if (
+      isEvmConnected &&
+      requiredWallet?.type === WalletType.REOWN_EVM &&
+      evmNetwork.chainId !== undefined
+    ) {
+      const numericChainId =
+        typeof evmNetwork.chainId === "string"
+          ? parseInt(evmNetwork.chainId, 10)
+          : evmNetwork.chainId;
+
+      if (requiredWallet.chainId !== numericChainId) {
+        const store = useWeb3Store.getState();
+        store.updateWalletChainId(WalletType.REOWN_EVM, numericChainId);
+      }
+    }
+  }, [evmNetwork.chainId, isEvmConnected, requiredWallet]);
+
+  useEffect(() => {
     if (chainSwitchError) {
       toast.error("Chain switch failed", {
         description: chainSwitchError,
@@ -98,9 +144,40 @@ export function SwapInterface({
     }
 
     try {
+      // First, check if we're using the correct wallet type for the source chain
+      const isWalletTypeCorrect = ensureCorrectWalletTypeForChain(sourceChain);
+
+      if (!isWalletTypeCorrect) {
+        const requiredWalletType = sourceChain.walletType;
+
+        toast.error(`${requiredWalletType} wallet required`, {
+          description: `Please connect a ${requiredWalletType} wallet to continue`,
+        });
+        return;
+      }
+
+      // Special handling for Sui - no chain switching yet
+      if (requiredWallet?.type === WalletType.SUIET_SUI) {
+        // For Sui, we just check if we're connected
+        if (!suiConnected) {
+          toast.error("Sui wallet not connected", {
+            description: "Please connect your Sui wallet to continue",
+          });
+          return;
+        }
+
+        // Execute the action directly since we can't switch chains in Sui yet
+        if (actionButton?.onClick) {
+          setIsProcessing(true);
+          await Promise.resolve(actionButton.onClick());
+        }
+        return;
+      }
+
+      // Then check if we're on the correct chain for EVM and Solana
       const isOnCorrectChain = await checkCurrentChain();
 
-      if (activeWallet && !isOnCorrectChain) {
+      if (requiredWallet && !isOnCorrectChain) {
         const toastId = toast.loading(
           `Switching to ${sourceChain.name} network...`,
           {
@@ -122,14 +199,6 @@ export function SwapInterface({
           id: toastId,
           description: `Successfully switched to ${sourceChain.name}`,
         });
-
-        const verifySwitch = await checkCurrentChain();
-        if (!verifySwitch) {
-          toast.error("Network mismatch", {
-            description: `Your wallet is still not on ${sourceChain.name}. Please try again.`,
-          });
-          return;
-        }
       }
 
       if (actionButton?.onClick) {

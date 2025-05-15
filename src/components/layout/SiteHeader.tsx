@@ -5,8 +5,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from "react";
 import useWeb3Store from "@/store/web3Store";
-import { disconnectMetamask, truncateAddress } from "@/utils/walletMethods";
-import { toast } from "sonner";
 import {
   Sheet,
   SheetContent,
@@ -21,7 +19,20 @@ import Link from "next/link";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
-  const activeWallet = useWeb3Store((state) => state.activeWallet);
+
+  const requiredWallet = useWeb3Store((state) =>
+    state.getWalletBySourceChain(),
+  );
+
+  const handleSheetClose = () => {
+    setIsOpen(false);
+  };
+
+  // Get wallet button text based on connection status
+  const getWalletButtonText = () => {
+    if (!requiredWallet) return "connect wallet";
+    return "wallet connected";
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,22 +50,6 @@ export function SiteHeader() {
       window.removeEventListener("resize", handleResize);
     };
   }, [isOpen]); // Only re-run if isOpen changes
-
-  const handleDisconnect = async () => {
-    if (activeWallet) {
-      try {
-        await disconnectMetamask();
-        setIsOpen(false); // Close the sheet after disconnecting
-      } catch (error) {
-        toast.error("Failed to disconnect wallet.");
-        console.error("Failed to disconnect wallet: ", error);
-      }
-    }
-  };
-
-  const handleSheetClose = () => {
-    setIsOpen(false);
-  };
 
   return (
     <header className="bg-background sticky top-0 z-40 w-full border-b">
@@ -115,52 +110,33 @@ export function SiteHeader() {
                 <nav className="flex flex-col gap-2">
                   <MainNav onNavigate={() => setIsOpen(false)} />
                 </nav>
-                {activeWallet ? (
-                  <BrandedButton
-                    className="md:inline-flex whitespace-nowrap text-sm h-[30px]"
-                    iconClassName="h-4 w-4"
-                    onClick={handleDisconnect}
-                    iconName="Wallet"
-                    buttonText={truncateAddress(activeWallet.address)}
-                  />
-                ) : (
-                  <ConnectWalletModal
-                    onSuccess={handleSheetClose}
-                    trigger={
-                      <BrandedButton
-                        className="md:inline-flex whitespace-nowrap text-sm h-[30px]"
-                        iconClassName="h-4 w-4"
-                        iconName="Wallet"
-                        buttonText="connect wallet"
-                      />
-                    }
-                  />
-                )}
+                {/* Always use ConnectWalletModal for mobile */}
+                <ConnectWalletModal
+                  onSuccess={handleSheetClose}
+                  trigger={
+                    <BrandedButton
+                      className="md:inline-flex whitespace-nowrap text-sm h-[30px]"
+                      iconClassName="h-4 w-4"
+                      iconName="Wallet"
+                      buttonText={getWalletButtonText()}
+                    />
+                  }
+                />
               </div>
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Wallet Button */}
-          {activeWallet ? (
-            <BrandedButton
-              className="hidden md:inline-flex whitespace-nowrap text-sm h-[30px]"
-              iconClassName="h-4 w-4"
-              onClick={handleDisconnect}
-              iconName="Wallet"
-              buttonText={truncateAddress(activeWallet.address)}
-            />
-          ) : (
-            <ConnectWalletModal
-              trigger={
-                <BrandedButton
-                  className="hidden md:inline-flex whitespace-nowrap text-sm h-[30px]"
-                  iconClassName="h-4 w-4"
-                  iconName="Wallet"
-                  buttonText="connect wallet"
-                />
-              }
-            />
-          )}
+          {/* Desktop Wallet Button - Always use ConnectWalletModal */}
+          <ConnectWalletModal
+            trigger={
+              <BrandedButton
+                className="hidden md:inline-flex whitespace-nowrap text-sm h-[30px]"
+                iconClassName="h-4 w-4"
+                iconName="Wallet"
+                buttonText={getWalletButtonText()}
+              />
+            }
+          />
         </div>
       </div>
     </header>
