@@ -1,7 +1,7 @@
 # Altverse: The Unified Crypto Interface
 
 #### Core Features:
-- Swapping & Bridging across the Solana, Sui, and EVM ecosystems
+- Swapping & Bridging across the Sui, Solana, and EVM ecosystems
 - (Automated) Farming/Vaulting with optimal yields **with assets sourced from any chain**
 - Lending/Borrowing at optimal rates
 - Unified dashboard of activity
@@ -23,11 +23,11 @@ Our platform does more than just aggregate protocols - we abstract away complexi
 ---
 
 ## Quick links
-- [Website](https://site-colosseum-breakout.vercel.app)
+- [Website](https://site-sui-overflow.vercel.app/)
 - [Token Fetcher Repository](https://github.com/altverseweb3/token-fetcher)
 - [Backend Repository](https://github.com/altverseweb3/backend)
 
-## `site-colosseum-breakout`
+## `site-sui-overflow`
 This repository is the frontend component for our project. The Altverse frontend enables users to connect up to 3 different wallets simultaneously across a selection of EVM, Solana and Sui wallets, providing an interface for users from all different chains to swap and stake tokens across Web3 seamlessly.
 
 ## Tech stack
